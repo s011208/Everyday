@@ -8,20 +8,30 @@ public class Card {
 
     public static final int CARD_TYPE_APK = 2;
 
-    private String mTitle;
+    public static final int ORDER_NONE = 9999;
 
-    private String mContent;
+    public static final int ID_NONE = -1;
 
-    public Card(String title, String content) {
-        mTitle = title;
-        mContent = content;
+    private int mOrder;
+
+    private int mType;
+
+    private int mId = ID_NONE;
+
+    public Card(int id, int type, int order) {
+        mType = type;
+        mId = id;
     }
 
-    public String getTitle() {
-        return mTitle;
+    public int getOrder() {
+        return mOrder;
     }
 
-    public String getContent() {
-        return mContent;
+    public int getType() {
+        return mType;
+    }
+
+    public int getId() {
+        return mId;
     }
 }

@@ -1,0 +1,25 @@
+<ViewSwitcher xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/card_switcher"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_centerInParent="true"
+    android:background="@color/card_background" >
+
+    <ProgressBar
+        android:id="@+id/card_loading_progress"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="@dimen/main_progress_circle_size"
+        android:layout_height="@dimen/main_progress_circle_size"
+        android:layout_gravity="center"
+        android:indeterminate="true"
+        android:indeterminateBehavior="repeat" />
+
+    <FrameLayout
+        android:id="@+id/card_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center" >
+    </FrameLayout>
+
+</ViewSwitcher>

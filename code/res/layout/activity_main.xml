@@ -4,31 +4,18 @@
     android:layout_height="match_parent"
     android:background="@color/main_activity_bg" >
 
-    <ScrollView
+    <ListView
+        android:id="@+id/card_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
         android:layout_marginBottom="@dimen/cards_container_margin_v"
         android:layout_marginLeft="@dimen/cards_container_margin_h"
         android:layout_marginRight="@dimen/cards_container_margin_h"
-        android:layout_marginTop="@dimen/cards_container_margin_v" >
-
-        <LinearLayout
-            android:id="@+id/cards_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#ffeeeeee"
-            android:orientation="vertical" >
-        </LinearLayout>
-    </ScrollView>
-
-    <ProgressBar
-        android:id="@+id/cards_loading_progress"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_width="@dimen/main_progress_circle_size"
-        android:layout_height="@dimen/main_progress_circle_size"
-        android:indeterminate="true"
-        android:indeterminateBehavior="repeat" />
+        android:layout_marginTop="@dimen/cards_container_margin_v"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="@dimen/cards_list_view_item_space" >
+    </ListView>
 
 </RelativeLayout>
