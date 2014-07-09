@@ -1,23 +1,28 @@
 
 package com.bj4.yhh.everyday.cards.weather;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
+import com.bj4.yhh.everyday.LoaderManager;
 import com.bj4.yhh.everyday.R;
 import com.bj4.yhh.everyday.cards.CardsRelativeLayout;
-import com.bj4.yhh.everyday.utils.Utils;
 
 import android.content.Context;
+import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.widget.TextView;
+import android.view.ViewGroup;
 
 public class WeartherCards extends CardsRelativeLayout {
+    private static final boolean DEBUG = true;
 
-    private static final String PREVIOUS_URL = "http://api.openweathermap.org/data/2.5/weather?q=";
+    private static final String TAG = "QQQQ";
 
-    private TextView mTxt;
+    private ViewPager mWeathersPager;
+
+    private WeatherPagerAdapter mWeatherPagerAdapter;
+
+    private Context mContext;
+
+    private LoaderManager.Callback mCallback;
 
     public WeartherCards(Context context) {
         this(context, null);
@@ -29,56 +34,46 @@ public class WeartherCards extends CardsRelativeLayout {
 
     public WeartherCards(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        mContext = context;
+    }
+
+    public void setCallback(LoaderManager.Callback cb) {
+        mCallback = cb;
+    }
+
+    public void onDataUpdated() {
+        if (mCallback != null) {
+            // content updated
+            // 1. measure view pager
+            int desiredWidth = MeasureSpec.makeMeasureSpec(mWeathersPager.getWidth(),
+                    MeasureSpec.AT_MOST);
+            int height = 0;
+            if (mWeathersPager.getChildCount() > 0) {
+                mWeathersPager.getChildAt(0).measure(desiredWidth, MeasureSpec.UNSPECIFIED);
+                height = mWeathersPager.getChildAt(0).getMeasuredHeight();
+            }
+            ViewGroup.LayoutParams params = mWeathersPager.getLayoutParams();
+            params.height = height;
+            mWeathersPager.setLayoutParams(params);
+            mWeathersPager.requestLayout();
+            // 2. measure list view
+            mCallback.setListViewHeightBasedOnChildren();
+        }
     }
 
     public void onFinishInflate() {
         super.onFinishInflate();
-        mTxt = (TextView)findViewById(R.id.txt);
-        mTxt.setText("123456");
         updateContent();
+        initCompoments();
+    }
+
+    private void initCompoments() {
+        mWeathersPager = (ViewPager)findViewById(R.id.weather_pager);
+        mWeatherPagerAdapter = new WeatherPagerAdapter(mContext, this);
+        mWeathersPager.setAdapter(mWeatherPagerAdapter);
     }
 
     @Override
     public void updateContent() {
-        sWorker.post(new Runnable() {
-            @Override
-            public void run() {
-                final String stream = Utils.parseOnInternet(PREVIOUS_URL + "Taipei,tw");
-                final String preProcessData = preProcessWeatherData(stream);
-                getHandler().post(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        mTxt.setText(preProcessData);
-                    }
-                });
-            }
-        });
-    }
-
-    /**
-     * http://openweathermap.org/weather-data
-     * http://openweathermap.org/weather-conditions
-     * http://openweathermap.org/help/city_list.txt
-     * 
-     * @param stream
-     * @return
-     */
-    private String preProcessWeatherData(String stream) {
-        String rtn = null;
-        try {
-            JSONObject json = new JSONObject(stream);
-            JSONObject main = json.getJSONObject("main");
-            long tempature = (long)(main.getLong("temp") - 273.15);
-            long tempatureMax = (long)(main.getLong("temp_max") - 273.15);
-            long tempatureMin = (long)(main.getLong("temp_min") - 273.15);
-            int weatherCondition = json.getInt("cod");
-            String city = json.getString("name");
-            rtn = "cod: " + weatherCondition + ", city: " + city + "\ntempature: " + tempature
-                    + ", tempatureMax: " + tempatureMax + ", tempatureMin: " + tempatureMin;
-        } catch (JSONException e) {
-            Log.e("QQQQ", "failed", e);
-        }
-        return rtn;
     }
 }

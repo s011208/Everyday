@@ -4,6 +4,8 @@ package com.bj4.yhh.everyday;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import com.bj4.yhh.everyday.activities.MainActivity;
+import com.bj4.yhh.everyday.cards.weather.WeartherCards;
 import com.bj4.yhh.everyday.database.DatabaseHelper;
 
 import android.content.Context;
@@ -17,6 +19,10 @@ import android.view.ViewParent;
 import android.widget.FrameLayout;
 
 public class LoaderManager {
+    private static final boolean DEBUG = true;
+
+    private static final String TAG = "QQQQ";
+
     private static LoaderManager sInstance;
 
     private Context mContext;
@@ -25,12 +31,14 @@ public class LoaderManager {
 
     private final ArrayList<Card> mCards = new ArrayList<Card>();
 
-    private final ArrayList<Callback> mCallbacks = new ArrayList<Callback>();
+    private Callback mCallbacks;
 
     private final LruCache<Integer, View> mCardsContentCache = new LruCache<Integer, View>(50);
 
     public interface Callback {
         public void dataLoadingDone();
+
+        public void setListViewHeightBasedOnChildren();
     }
 
     public interface LoadingCardCallback {
@@ -52,15 +60,15 @@ public class LoaderManager {
 
     private LoaderManager(Context context) {
         mContext = context.getApplicationContext();
-        mDatabaseHelper = new DatabaseHelper(mContext);
+        mDatabaseHelper = DatabaseHelper.getInstance(mContext);
         forceReload();
     }
 
     public void forceReload() {
         mCards.clear();
         mCards.addAll(mDatabaseHelper.getCards());
-        for (Callback cb : mCallbacks) {
-            cb.dataLoadingDone();
+        if (mCallbacks != null) {
+            mCallbacks.dataLoadingDone();
         }
     }
 
@@ -69,13 +77,11 @@ public class LoaderManager {
     }
 
     public void addCallback(Callback cb) {
-        if (mCallbacks.indexOf(cb) == -1) {
-            mCallbacks.add(cb);
-        }
+        mCallbacks = cb;
     }
 
     public void removeCallback(Callback cb) {
-        mCallbacks.remove(cb);
+        mCallbacks = null;
     }
 
     public void loadCardContent(Card card, FrameLayout container, LoadingCardCallback cb,
@@ -117,10 +123,12 @@ public class LoaderManager {
             int result = LoadingCardCallback.RESULT_FAILED;
             switch (mCard.getType()) {
                 case Card.CARD_TYPE_WEATHER:
-                    Log.e("QQQQ", "create weather");
+                    if (DEBUG)
+                        Log.v(TAG, "create weather");
                     LayoutInflater inflater = (LayoutInflater)mContext
                             .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                     View v = inflater.inflate(R.layout.weather_card, null);
+                    ((WeartherCards)v).setCallback(mCallbacks);
                     mCardsContentCache.put(mCard.getId(), v);
                     result = LoadingCardCallback.RESULT_OK;
                     break;

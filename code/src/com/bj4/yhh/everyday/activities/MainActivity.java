@@ -63,7 +63,7 @@ public class MainActivity extends Activity implements LoaderManager.Callback {
                     @Override
                     public void requestRefresh() {
                         if (mCardList != null) {
-                            setListViewHeightBasedOnChildren(mCardList);
+                            setListViewHeightBasedOnChildren();
                         }
                     }
                 });
@@ -81,24 +81,24 @@ public class MainActivity extends Activity implements LoaderManager.Callback {
         forceReload();
     }
 
-    public static void setListViewHeightBasedOnChildren(ListView listView) {
-        ListAdapter listAdapter = listView.getAdapter();
+    public void setListViewHeightBasedOnChildren() {
+        ListAdapter listAdapter = mCardList.getAdapter();
         if (listAdapter == null) {
             // pre-condition
             return;
         }
 
         int totalHeight = 0;
-        int desiredWidth = MeasureSpec.makeMeasureSpec(listView.getWidth(), MeasureSpec.AT_MOST);
+        int desiredWidth = MeasureSpec.makeMeasureSpec(mCardList.getWidth(), MeasureSpec.AT_MOST);
         for (int i = 0; i < listAdapter.getCount(); i++) {
-            View listItem = listAdapter.getView(i, null, listView);
+            View listItem = listAdapter.getView(i, null, mCardList);
             listItem.measure(desiredWidth, MeasureSpec.UNSPECIFIED);
             totalHeight += listItem.getMeasuredHeight();
         }
 
-        ViewGroup.LayoutParams params = listView.getLayoutParams();
-        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
-        listView.setLayoutParams(params);
-        listView.requestLayout();
+        ViewGroup.LayoutParams params = mCardList.getLayoutParams();
+        params.height = totalHeight + (mCardList.getDividerHeight() * (listAdapter.getCount() - 1));
+        mCardList.setLayoutParams(params);
+        mCardList.requestLayout();
     }
 }
