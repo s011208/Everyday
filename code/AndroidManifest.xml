@@ -18,6 +18,7 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
+        android:largeHeap="true"
         android:theme="@style/AppTheme" >
         <activity
             android:name="com.bj4.yhh.everyday.activities.MainActivity"
@@ -27,6 +28,11 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name="com.bj4.yhh.everyday.cards.weather.WeatherSettingActivity"
+            android:label="@string/app_name"
+            android:launchMode="singleTask" >
         </activity>
     </application>
 

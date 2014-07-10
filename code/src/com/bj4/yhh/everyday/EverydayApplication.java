@@ -17,12 +17,12 @@ public class EverydayApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        // init loader manager
-        getLoaderManager(this);
+        getLoaderManager(this).registerReceiver();
     }
 
     @Override
     public void onTerminate() {
         super.onTerminate();
+        getLoaderManager(this).unregisterReceiver();
     }
 }

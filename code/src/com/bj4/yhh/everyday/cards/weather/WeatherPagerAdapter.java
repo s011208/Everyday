@@ -7,11 +7,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.bj4.yhh.everyday.Card;
+import com.bj4.yhh.everyday.LoaderManager;
 import com.bj4.yhh.everyday.R;
 import com.bj4.yhh.everyday.database.DatabaseHelper;
 import com.bj4.yhh.everyday.utils.Utils;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v4.view.PagerAdapter;
@@ -20,6 +24,8 @@ import android.util.Log;
 import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class WeatherPagerAdapter extends PagerAdapter {
@@ -48,7 +54,6 @@ public class WeatherPagerAdapter extends PagerAdapter {
     }
 
     private void initData() {
-        mData.clear();
         new WeatherDataLoader().execute();
     }
 
@@ -73,6 +78,7 @@ public class WeatherPagerAdapter extends PagerAdapter {
 
         @Override
         protected void onPostExecute(Void result) {
+            mData.clear();
             mData.addAll(data);
             notifyDataSetChanged();
             if (DEBUG)
@@ -110,9 +116,11 @@ public class WeatherPagerAdapter extends PagerAdapter {
                     int conditionCode = weatherObject.getInt("id");
                     String conditionDes = weatherObject.getString("description");
                     String conditionIcon = weatherObject.getString("icon");
+                    JSONObject wind = json.getJSONObject("wind");
+                    int windSpeed = wind.getInt("speed");
                     data.add(new WeatherData(tempature, tempatureMax, tempatureMin, humidity,
                             sunSet, sunRise, cityId, cityName, nationName, conditionCode,
-                            conditionDes, conditionIcon));
+                            conditionDes, conditionIcon, windSpeed));
                 }
             } catch (JSONException e) {
                 if (DEBUG)
@@ -122,14 +130,8 @@ public class WeatherPagerAdapter extends PagerAdapter {
         }
     }
 
-    public void notifyDataSetChanged(boolean forceReload) {
-        if (forceReload) {
-            initData();
-        }
-        super.notifyDataSetChanged();
-        if (mWeartherCards != null) {
-            mWeartherCards.onDataUpdated();
-        }
+    public void forceReload() {
+        initData();
     }
 
     public void notifyDataSetChanged() {
@@ -144,12 +146,94 @@ public class WeatherPagerAdapter extends PagerAdapter {
         return mData.size();
     }
 
+    private int getWeatherIconResource(int condition) {
+        int rtn = R.drawable.ic_clear_sky;
+        if (condition == 800) {
+            rtn = R.drawable.ic_clear_sky;
+        } else if (condition == 801) {
+            rtn = R.drawable.ic_few_cloudy;
+        } else if (condition == 802) {
+            rtn = R.drawable.ic_scattered_cloudy;
+        } else if (condition == 803) {
+            rtn = R.drawable.ic_broken_cloudy;
+        } else if (condition == 804) {
+            rtn = R.drawable.ic_broken_cloudy;
+        } else if (condition < 300) {
+            rtn = R.drawable.ic_thunderstorm;
+        } else if (condition < 400) {
+            rtn = R.drawable.ic_shower_rain;
+        } else if (condition < 500) {
+            rtn = R.drawable.ic_shower_rain;
+        } else if (condition < 600) {
+            rtn = R.drawable.ic_rain;
+        } else if (condition < 700) {
+            rtn = R.drawable.ic_snow;
+        } else if (condition < 800) {
+            rtn = R.drawable.ic_mist;
+        }
+        return rtn;
+    }
+
+    private View generateWeatherView(final WeatherData data, final int position) {
+        View v = null;
+        v = mInflater.inflate(R.layout.weather_card_pager_content, null);
+        TextView weatherLocation = (TextView)v.findViewById(R.id.weather_location);
+        weatherLocation.setText(data.mCityName + ", " + data.mNationName);
+        ImageView weatherImage = (ImageView)v.findViewById(R.id.weather_icon);
+        weatherImage.setImageResource(getWeatherIconResource(data.mConditionCode));
+        TextView weatherDescription = (TextView)v.findViewById(R.id.weather_description);
+        weatherDescription.setText(data.mConditionDescription + "");
+        TextView weatherHumidity = (TextView)v.findViewById(R.id.weather_humidity);
+        weatherHumidity.setText(data.mHumidity + "");
+        TextView weatherWind = (TextView)v.findViewById(R.id.weather_wind);
+        weatherWind.setText(data.mWind + "");
+        TextView weatherTemp = (TextView)v.findViewById(R.id.weather_temp);
+        weatherTemp.setText(data.mCurrentTempature + " \u00b0");
+        TextView weatherTempMax = (TextView)v.findViewById(R.id.weather_temp_max);
+        weatherTempMax.setText(data.mMaxTempature + " \u00b0");
+        TextView weatherTempMin = (TextView)v.findViewById(R.id.weather_temp_min);
+        weatherTempMin.setText(data.mMinTempature + " \u00b0");
+        ImageView weatherOption = (ImageView)v.findViewById(R.id.weather_option);
+        weatherOption.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mContext, WeatherSettingActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                mContext.startActivity(intent);
+            }
+        });
+        ImageView weatherPrevious = (ImageView)v.findViewById(R.id.weather_move_to_previous);
+        if (position == 0) {
+            weatherPrevious.setVisibility(View.INVISIBLE);
+        } else {
+            weatherPrevious.setVisibility(View.VISIBLE);
+            weatherPrevious.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mWeartherCards.moveToPrevious();
+                }
+            });
+        }
+        ImageView weatherNext = (ImageView)v.findViewById(R.id.weather_move_to_next);
+        if (position == getCount() - 1) {
+            weatherNext.setVisibility(View.INVISIBLE);
+        } else {
+            weatherNext.setVisibility(View.VISIBLE);
+            weatherNext.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mWeartherCards.moveToNext();
+                }
+            });
+        }
+        return v;
+    }
+
     @Override
     public Object instantiateItem(View collection, int position) {
         View v = mCachedView.get(position);
         if (v == null) {
-            v = mInflater.inflate(R.layout.weather_card_pager_content, null);
-            ((TextView)v).setText(mData.get(position).toString());
+            v = generateWeatherView(mData.get(position), position);
         }
         ((ViewPager)collection).addView(v);
         if (DEBUG)

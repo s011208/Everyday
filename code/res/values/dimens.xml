@@ -7,5 +7,6 @@
     <dimen name="cards_container_margin_v">10dp</dimen>
     <dimen name="main_progress_circle_size">50dp</dimen>
     <dimen name="cards_list_view_item_space">8dp</dimen>
+    <dimen name="cards_padding">10dp</dimen>
 
 </resources>

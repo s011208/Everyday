@@ -1,4 +1,7 @@
 <resources>
-    <color name="main_activity_bg">#ff999999</color>
-    <color name="card_background">#ffeeeeee</color>
+
+    <color name="main_activity_bg">#ffcccccc</color>
+    <color name="white">#ffffff</color>
+    <color name="light_shadow">#66000000</color>
+
 </resources>

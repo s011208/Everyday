@@ -9,7 +9,9 @@ import android.content.Context;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 public class WeartherCards extends CardsRelativeLayout {
     private static final boolean DEBUG = true;
@@ -23,6 +25,8 @@ public class WeartherCards extends CardsRelativeLayout {
     private Context mContext;
 
     private LoaderManager.Callback mCallback;
+
+    private ProgressBar mLoading;
 
     public WeartherCards(Context context) {
         this(context, null);
@@ -42,6 +46,7 @@ public class WeartherCards extends CardsRelativeLayout {
     }
 
     public void onDataUpdated() {
+        mLoading.setVisibility(View.GONE);
         if (mCallback != null) {
             // content updated
             // 1. measure view pager
@@ -63,17 +68,28 @@ public class WeartherCards extends CardsRelativeLayout {
 
     public void onFinishInflate() {
         super.onFinishInflate();
-        updateContent();
         initCompoments();
     }
 
     private void initCompoments() {
+        mLoading = (ProgressBar)findViewById(R.id.loading_progress);
         mWeathersPager = (ViewPager)findViewById(R.id.weather_pager);
         mWeatherPagerAdapter = new WeatherPagerAdapter(mContext, this);
         mWeathersPager.setAdapter(mWeatherPagerAdapter);
     }
 
+    public void moveToPrevious() {
+        mWeathersPager.setCurrentItem(mWeathersPager.getCurrentItem() - 1, true);
+    }
+
+    public void moveToNext() {
+        mWeathersPager.setCurrentItem(mWeathersPager.getCurrentItem() + 1, true);
+    }
+
     @Override
     public void updateContent() {
+        if (mWeatherPagerAdapter != null) {
+            mWeatherPagerAdapter.forceReload();
+        }
     }
 }

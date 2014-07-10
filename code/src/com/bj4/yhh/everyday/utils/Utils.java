@@ -25,11 +25,10 @@ public class Utils {
                 sb.append(s);
             }
         } catch (Exception e) {
-            Log.e("QQQQ", "failed", e);
         } finally {
             try {
                 is.close();
-            } catch (IOException ioe) {
+            } catch (Exception ioe) {
             }
         }
         return sb.toString();

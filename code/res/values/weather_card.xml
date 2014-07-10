@@ -1,0 +1,19 @@
+<resources>
+
+    <dimen name="weather_icon_size">60dp</dimen>
+    <dimen name="weather_location_txtsize">25sp</dimen>
+    <dimen name="weather_weather_temp_txtsize">50sp</dimen>
+    <dimen name="weather_weather_temp_min_max_txtsize">14sp</dimen>
+    <dimen name="weather_option_ic_size">50dp</dimen>
+    <dimen name="weather_left_right_ic_size">30dp</dimen>
+    <dimen name="weather_option_ic_padding">10dp</dimen>
+    <dimen name="weather_humidity_wind_ic_size">20dp</dimen>
+    <dimen name="weather_setting_remove_ic_size">70dp</dimen>
+    <dimen name="weather_setting_remove_ic_padding">5dp</dimen>
+    <dimen name="weather_setting_remove_bar_height">100dp</dimen>
+
+    <color name="weather_txt_color">#ffffff</color>
+    <color name="weather_temp_max_txt_color">#666666</color>
+    <color name="weather_temp_min_txt_color">#000000</color>
+
+</resources>

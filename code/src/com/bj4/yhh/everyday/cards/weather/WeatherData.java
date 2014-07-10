@@ -25,10 +25,12 @@ public class WeatherData {
     String mConditionDescription;
 
     String mConditionIcon;
+    
+    int mWind;
 
     public WeatherData(long currentTemp, long maxTemp, long minTemp, int humidity, long sunset,
             long sunrise, int cityid, String cityName, String nationName, int conditionCode,
-            String conditionDes, String conditionIcon) {
+            String conditionDes, String conditionIcon, int wind) {
         mCurrentTempature = currentTemp;
         mMaxTempature = maxTemp;
         mMinTempature = minTemp;
@@ -41,6 +43,7 @@ public class WeatherData {
         mConditionCode = conditionCode;
         mConditionDescription = conditionDes;
         mConditionIcon = conditionIcon;
+        mWind = wind;
     }
 
     @Override
@@ -49,6 +52,6 @@ public class WeatherData {
                 + mMinTempature + ", humidity: " + mHumidity + ", sunset: " + mSunSet
                 + ", sunrise: " + mSunRise + ", cityId: " + mCityId + ", cityName: " + mCityName
                 + ", nation: " + mNationName + ", cond code: " + mConditionCode + ", cond des: "
-                + mConditionDescription + ", cond icon: " + mConditionIcon;
+                + mConditionDescription + ", cond icon: " + mConditionIcon + ", wind: " + mWind;
     }
 }
