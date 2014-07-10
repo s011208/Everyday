@@ -6,7 +6,7 @@ public class Card {
 
     public static final int CARD_TYPE_WEATHER = 1;
 
-    public static final int CARD_TYPE_APK = 2;
+    public static final int CARD_TYPE_ALLAPPS = 2;
 
     public static final int ORDER_NONE = 9999;
 

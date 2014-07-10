@@ -1,0 +1,7 @@
+<resources>
+
+    <dimen name="allapps_shortcut_size">120dp</dimen>
+    <dimen name="allapps_shortcut_icon_size">50dp</dimen>
+    <dimen name="allapps_shortcut_padding">10dp</dimen>
+
+</resources>

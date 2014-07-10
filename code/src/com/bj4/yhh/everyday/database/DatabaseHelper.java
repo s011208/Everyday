@@ -59,6 +59,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String TABLE_CITIES_LIST_NATION = "city_nation";
 
+    // allapps table
+    private static final String TABLE_ALL_APPS = "all_apps";
+
+    private static final String TABLE_ALL_APPS_ID = "_id";
+
+    private static final String TABLE_ALL_APPS_PKG = "pkg";
+
+    private static final String TABLE_ALL_APPS_CLZ = "clz";
+
+    private static final String TABLE_ALL_APPS_ORDER = "all_apps_order";
+
     private SQLiteDatabase mDb;
 
     private Context mContext;
@@ -108,7 +119,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             // cards type
             addNewCard(Card.CARD_TYPE_NEWS, Card.ORDER_NONE);
             addNewCard(Card.CARD_TYPE_WEATHER, Card.ORDER_NONE);
-            addNewCard(Card.CARD_TYPE_APK, Card.ORDER_NONE);
+            addNewCard(Card.CARD_TYPE_ALLAPPS, Card.ORDER_NONE);
 
             // weather cards
             addNewWeatherCards(1668355);
@@ -135,7 +146,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         + " INTEGER PRIMARY KEY, " + TABLE_CITIES_LIST_LAT + " TEXT, "
                         + TABLE_CITIES_LIST_LON + " TEXT, " + TABLE_CITIES_LIST_NAME + " TEXT, "
                         + TABLE_CITIES_LIST_NATION + " TEXT)");
+        // allapps
+        getDataBase().execSQL(
+                "CREATE TABLE IF NOT EXISTS " + TABLE_ALL_APPS + "(" + TABLE_ALL_APPS_ID
+                        + " INTEGER PRIMARY KEY AUTOINCREMENT, " + TABLE_ALL_APPS_PKG + " TEXT, "
+                        + TABLE_ALL_APPS_CLZ + " TEXT, " + TABLE_ALL_APPS_ORDER + " INTEGER)");
     }
+
+    // +++allapps
+    // ---allapps
+    // +++ weather related
 
     public boolean hasCitiesTableLoaded() {
         Cursor data = getDataBase().rawQuery("select count(*) from " + TABLE_CITIES_LIST, null);
@@ -314,6 +334,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return rtn;
     }
 
+    // --- weather related
+    // +++ basic cards
     public ArrayList<Card> getCards() {
         ArrayList<Card> rtn = new ArrayList<Card>();
         Cursor data = getDataBase().query(TABLE_CARDS, null, null, null, null, null,
@@ -339,6 +361,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cv.put(TABLE_CARDS_COLUMN_ORDER, order);
         getDataBase().insert(TABLE_CARDS, null, cv);
     }
+
+    // --- basic cards
 
     @Override
     public void onCreate(SQLiteDatabase db) {

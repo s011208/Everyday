@@ -163,17 +163,27 @@ public class LoaderManager {
         @Override
         protected Integer doInBackground(Void... params) {
             int result = LoadingCardCallback.RESULT_FAILED;
+            LayoutInflater inflater = (LayoutInflater)mContext
+                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             switch (mCard.getType()) {
                 case Card.CARD_TYPE_WEATHER:
                     if (DEBUG)
                         Log.v(TAG, "create weather");
-                    LayoutInflater inflater = (LayoutInflater)mContext
-                            .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                    CardsRelativeLayout v = (CardsRelativeLayout)inflater.inflate(
+                    CardsRelativeLayout weatherCard = (CardsRelativeLayout)inflater.inflate(
                             R.layout.weather_card, null);
-                    v.setCardType(mCard.getType());
-                    ((WeartherCards)v).setCallback(mCallbacks);
-                    mCardsContentCache.put(mCard.getId(), v);
+                    weatherCard.setCardType(mCard.getType());
+                    weatherCard.setCallback(mCallbacks);
+                    mCardsContentCache.put(mCard.getId(), weatherCard);
+                    result = LoadingCardCallback.RESULT_OK;
+                    break;
+                case Card.CARD_TYPE_ALLAPPS:
+                    if (DEBUG)
+                        Log.v(TAG, "create weather");
+                    CardsRelativeLayout allappsCard = (CardsRelativeLayout)inflater.inflate(
+                            R.layout.allapps_card, null);
+                    allappsCard.setCardType(mCard.getType());
+                    allappsCard.setCallback(mCallbacks);
+                    mCardsContentCache.put(mCard.getId(), allappsCard);
                     result = LoadingCardCallback.RESULT_OK;
                     break;
             }

@@ -27,10 +27,6 @@ public class WeartherCards extends CardsRelativeLayout {
 
     private WeatherPagerAdapter mWeatherPagerAdapter;
 
-    private Context mContext;
-
-    private LoaderManager.Callback mCallback;
-
     private ProgressBar mLoading;
 
     private ImageView mOption, mNextPage, mPreviousPage;
@@ -49,12 +45,8 @@ public class WeartherCards extends CardsRelativeLayout {
 
     public WeartherCards(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        mContext = context;
     }
 
-    public void setCallback(LoaderManager.Callback cb) {
-        mCallback = cb;
-    }
 
     public void onDataUpdated() {
         mLoading.setVisibility(View.GONE);
@@ -79,11 +71,6 @@ public class WeartherCards extends CardsRelativeLayout {
         refreshContent(mWeathersPager.getCurrentItem());
     }
 
-    public void onFinishInflate() {
-        super.onFinishInflate();
-        initCompoments();
-    }
-
     private void refreshContent(int position) {
         if (mWeatherPagerAdapter != null && mWeatherPagerAdapter.getCount() > 0) {
             final WeatherData data = mWeatherPagerAdapter.getItem(position);
@@ -105,7 +92,7 @@ public class WeartherCards extends CardsRelativeLayout {
         }
     }
 
-    private void initCompoments() {
+    public void initCompoments() {
         mLoading = (ProgressBar)findViewById(R.id.loading_progress);
         mWeathersPager = (ViewPager)findViewById(R.id.weather_pager);
         mWeathersPager.setOnPageChangeListener(new OnPageChangeListener() {
