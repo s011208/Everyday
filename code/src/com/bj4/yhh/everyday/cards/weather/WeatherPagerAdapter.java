@@ -80,6 +80,9 @@ public class WeatherPagerAdapter extends PagerAdapter {
         protected void onPostExecute(Void result) {
             mData.clear();
             mData.addAll(data);
+            if (mData.size() == 0) {
+                mCachedView.evictAll();
+            }
             notifyDataSetChanged();
             if (DEBUG)
                 Log.i(TAG, "parse done");
@@ -174,11 +177,13 @@ public class WeatherPagerAdapter extends PagerAdapter {
         return rtn;
     }
 
+    public WeatherData getItem(int position) {
+        return mData.get(position);
+    }
+
     private View generateWeatherView(final WeatherData data, final int position) {
         View v = null;
         v = mInflater.inflate(R.layout.weather_card_pager_content, null);
-        TextView weatherLocation = (TextView)v.findViewById(R.id.weather_location);
-        weatherLocation.setText(data.mCityName + ", " + data.mNationName);
         ImageView weatherImage = (ImageView)v.findViewById(R.id.weather_icon);
         weatherImage.setImageResource(getWeatherIconResource(data.mConditionCode));
         TextView weatherDescription = (TextView)v.findViewById(R.id.weather_description);
@@ -193,39 +198,6 @@ public class WeatherPagerAdapter extends PagerAdapter {
         weatherTempMax.setText(data.mMaxTempature + " \u00b0");
         TextView weatherTempMin = (TextView)v.findViewById(R.id.weather_temp_min);
         weatherTempMin.setText(data.mMinTempature + " \u00b0");
-        ImageView weatherOption = (ImageView)v.findViewById(R.id.weather_option);
-        weatherOption.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(mContext, WeatherSettingActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                mContext.startActivity(intent);
-            }
-        });
-        ImageView weatherPrevious = (ImageView)v.findViewById(R.id.weather_move_to_previous);
-        if (position == 0) {
-            weatherPrevious.setVisibility(View.INVISIBLE);
-        } else {
-            weatherPrevious.setVisibility(View.VISIBLE);
-            weatherPrevious.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mWeartherCards.moveToPrevious();
-                }
-            });
-        }
-        ImageView weatherNext = (ImageView)v.findViewById(R.id.weather_move_to_next);
-        if (position == getCount() - 1) {
-            weatherNext.setVisibility(View.INVISIBLE);
-        } else {
-            weatherNext.setVisibility(View.VISIBLE);
-            weatherNext.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mWeartherCards.moveToNext();
-                }
-            });
-        }
         return v;
     }
 

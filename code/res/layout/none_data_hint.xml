@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/none_data_hint"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:visibility="gone"
+    android:gravity="center"
+    android:padding="10dp"
+    android:text="@string/none_data_hint"
+    android:textColor="#000"
+    android:textSize="32sp" >
+
+</TextView>

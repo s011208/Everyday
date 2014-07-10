@@ -3,13 +3,68 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <android.support.v4.view.ViewPager
-        android:id="@+id/weather_pager"
+    <RelativeLayout
+        android:id="@+id/weather_card_main_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentTop="true" >
-    </android.support.v4.view.ViewPager>
+        android:visibility="invisible" >
+
+        <RelativeLayout
+            android:id="@+id/weather_top_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/weather_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:textColor="@color/weather_txt_color"
+                android:textSize="@dimen/weather_location_txtsize" />
+
+            <ImageView
+                android:id="@+id/weather_option"
+                android:layout_width="@dimen/weather_option_ic_size"
+                android:layout_height="@dimen/weather_option_ic_size"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="5dp"
+                android:padding="@dimen/weather_option_ic_padding"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_option_btn" />
+        </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/weather_move_to_previous"
+            android:layout_width="@dimen/weather_left_right_ic_size"
+            android:layout_height="@dimen/weather_left_right_ic_size"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:padding="@dimen/weather_option_ic_padding"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_to_previous_btn" />
+
+        <ImageView
+            android:id="@+id/weather_move_to_next"
+            android:layout_width="@dimen/weather_left_right_ic_size"
+            android:layout_height="@dimen/weather_left_right_ic_size"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:padding="@dimen/weather_option_ic_padding"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_to_next_btn" />
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/weather_pager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentBottom="true"
+            android:layout_below="@+id/weather_top_layout"
+            android:layout_toLeftOf="@+id/weather_move_to_next"
+            android:layout_toRightOf="@+id/weather_move_to_previous" >
+        </android.support.v4.view.ViewPager>
+    </RelativeLayout>
 
     <ProgressBar
         android:id="@+id/loading_progress"

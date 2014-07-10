@@ -26,6 +26,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.DragEvent;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.DragShadowBuilder;
@@ -110,6 +111,30 @@ public class WeatherSettingActivity extends Activity {
     }
 
     private ValueAnimator mTranslationBottomLayoutYAnim;
+
+    public boolean dispatchKeyEvent(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+            addNewCity();
+            return true;
+        }
+        return super.dispatchKeyEvent(e);
+    };
+
+    private void addNewCity() {
+        int cityId = mDatabaseHelper.getCityId(mAutoCompleteCity.getText().toString());
+        if (cityId == -1) {
+            if (DEBUG)
+                Log.e(TAG, "cityId is -1");
+        } else {
+            boolean success = mDatabaseHelper.addNewWeatherCards(cityId) > -1;
+            if (success) {
+                updateWeatherCards();
+                mCityListAdapter.notifyDataSetChanged();
+                mAutoCompleteCity.setText("");
+            } else {// XXX
+            }
+        }
+    }
 
     private void init() {
         mDatabaseHelper = DatabaseHelper.getInstance(this);
@@ -226,19 +251,7 @@ public class WeatherSettingActivity extends Activity {
         mAddNewCity.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                int cityId = mDatabaseHelper.getCityId(mAutoCompleteCity.getText().toString());
-                if (cityId == -1) {
-                    if (DEBUG)
-                        Log.e(TAG, "cityId is -1");
-                } else {
-                    boolean success = mDatabaseHelper.addNewWeatherCards(cityId) > -1;
-                    if (success) {
-                        updateWeatherCards();
-                        mCityListAdapter.notifyDataSetChanged();
-                        mAutoCompleteCity.setText("");
-                    } else {// XXX
-                    }
-                }
+                addNewCity();
             }
         });
 
@@ -389,6 +402,8 @@ public class WeatherSettingActivity extends Activity {
                 holder = (ViewHolder)convertView.getTag();
             }
             final City city = getItem(position);
+            convertView.setVisibility(View.VISIBLE);
+            convertView.setAlpha(1);
             holder.mTxt.setText(city.mCity + ", " + city.mNation);
             return convertView;
         }

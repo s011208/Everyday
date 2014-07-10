@@ -34,36 +34,38 @@
         android:layout_height="match_parent"
         android:visibility="gone" >
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/top_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal" >
-
-            <AutoCompleteTextView
-                android:id="@+id/autocompletecity"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_margin="5dp"
-                android:layout_weight="5" />
+            android:layout_height="wrap_content" >
 
             <ImageView
                 android:id="@+id/add_new_city"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="1"
+                android:layout_width="@dimen/weather_setting_remove_ic_size"
+                android:layout_height="@dimen/weather_setting_remove_ic_size"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
                 android:padding="5dp"
                 android:scaleType="centerInside"
                 android:src="@drawable/ic_add" />
-        </LinearLayout>
+
+            <AutoCompleteTextView
+                android:id="@+id/autocompletecity"
+                android:layout_width="match_parent"
+                android:singleLine="true"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:layout_margin="5dp"
+                android:layout_toLeftOf="@+id/add_new_city" />
+        </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/bottom_layout"
             android:layout_width="match_parent"
             android:layout_height="@dimen/weather_setting_remove_bar_height"
-            android:layout_alignParentBottom="true" >
+            android:layout_alignParentBottom="true"
+            android:background="#33000000" >
 
             <ImageView
                 android:id="@+id/remove_city"
