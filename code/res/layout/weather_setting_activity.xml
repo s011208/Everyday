@@ -52,12 +52,12 @@
             <AutoCompleteTextView
                 android:id="@+id/autocompletecity"
                 android:layout_width="match_parent"
-                android:singleLine="true"
                 android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/add_new_city"
                 android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true"
                 android:layout_margin="5dp"
-                android:layout_toLeftOf="@+id/add_new_city" />
+                android:layout_toLeftOf="@+id/add_new_city"
+                android:singleLine="true" />
         </RelativeLayout>
 
         <RelativeLayout
