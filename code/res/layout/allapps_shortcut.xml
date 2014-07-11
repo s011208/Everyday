@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/allapps_shortcut_width"
+    android:layout_height="@dimen/allapps_shortcut_height"
+    android:gravity="center"
+    android:padding="@dimen/allapps_shortcut_padding"
+    android:ellipsize="end"
+    android:minWidth="@dimen/allapps_shortcut_width"
+    android:maxWidth="@dimen/allapps_shortcut_width"
+    android:background="@drawable/ic_shortcut"
+    android:maxLines="1"
+    android:textColor="#000" >
+
+</TextView>

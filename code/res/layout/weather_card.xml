@@ -25,12 +25,12 @@
 
             <ImageView
                 android:id="@+id/weather_option"
-                android:layout_width="@dimen/weather_option_ic_size"
-                android:layout_height="@dimen/weather_option_ic_size"
+                android:layout_width="@dimen/option_ic_size"
+                android:layout_height="@dimen/option_ic_size"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:layout_marginRight="5dp"
-                android:padding="@dimen/weather_option_ic_padding"
+                android:padding="@dimen/option_ic_padding"
                 android:scaleType="centerInside"
                 android:src="@drawable/ic_option_btn" />
         </RelativeLayout>
@@ -41,7 +41,7 @@
             android:layout_height="@dimen/weather_left_right_ic_size"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-            android:padding="@dimen/weather_option_ic_padding"
+            android:padding="@dimen/option_ic_padding"
             android:scaleType="centerInside"
             android:src="@drawable/ic_to_previous_btn" />
 
@@ -51,7 +51,7 @@
             android:layout_height="@dimen/weather_left_right_ic_size"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:padding="@dimen/weather_option_ic_padding"
+            android:padding="@dimen/option_ic_padding"
             android:scaleType="centerInside"
             android:src="@drawable/ic_to_next_btn" />
 

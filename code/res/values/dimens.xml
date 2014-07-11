@@ -8,5 +8,7 @@
     <dimen name="main_progress_circle_size">50dp</dimen>
     <dimen name="cards_list_view_item_space">8dp</dimen>
     <dimen name="cards_padding">10dp</dimen>
+    <dimen name="option_ic_padding">10dp</dimen>
+    <dimen name="option_ic_size">50dp</dimen>
 
 </resources>

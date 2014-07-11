@@ -9,6 +9,7 @@ import java.util.Collections;
 
 import com.bj4.yhh.everyday.Card;
 import com.bj4.yhh.everyday.SettingManager;
+import com.bj4.yhh.everyday.cards.allapps.ShortCut;
 import com.bj4.yhh.everyday.cards.weather.City;
 
 import android.content.ContentValues;
@@ -126,6 +127,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             addNewWeatherCards(1670029);
             addNewWeatherCards(1670310);
             sm.setLoadDefault(true);
+
+            // allapps shortcuts
+            addNewAllappsShortCut("com.asus.message", "com.android.mms.ui.ConversationList");
+            addNewAllappsShortCut("com.asus.filemanager", "com.asus.filemanager.activity.FileManagerActivity");
+            addNewAllappsShortCut("com.asus.browser", "com.android.browser.BrowserActivity");
         }
     }
 
@@ -154,6 +160,52 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     // +++allapps
+    public ArrayList<ShortCut> getAllappsShortCut() {
+        ArrayList<ShortCut> rtn = new ArrayList<ShortCut>();
+        Cursor data = getDataBase().query(TABLE_ALL_APPS, new String[] {
+                TABLE_ALL_APPS_ID, TABLE_ALL_APPS_PKG, TABLE_ALL_APPS_CLZ
+        }, null, null, null, null, TABLE_ALL_APPS_ORDER);
+        if (data != null) {
+            while (data.moveToNext()) {
+                rtn.add(new ShortCut(data.getString(1), data.getString(2), data.getInt(0)));
+            }
+            data.close();
+        }
+        return rtn;
+    }
+
+    public void addNewAllappsShortCut(String pkg, String clz) {
+        int order = getAllappsShotCutMaxCount() + 1;
+        ContentValues cv = new ContentValues();
+        cv.put(TABLE_ALL_APPS_PKG, pkg);
+        cv.put(TABLE_ALL_APPS_CLZ, clz);
+        cv.put(TABLE_ALL_APPS_ORDER, order);
+        getDataBase().insert(TABLE_ALL_APPS, null, cv);
+    }
+
+    public void removeAllappsShortCut(int id) {
+        getDataBase().delete(TABLE_ALL_APPS, TABLE_ALL_APPS_ID + "=" + id, null);
+    }
+
+    public void removeAllappsShortCut(String pkg, String clz) {
+        getDataBase().delete(TABLE_ALL_APPS,
+                TABLE_ALL_APPS_PKG + "='" + pkg + "' and " + TABLE_ALL_APPS_CLZ + "='" + clz + "'",
+                null);
+    }
+
+    public int getAllappsShotCutMaxCount() {
+        int rtn = 0;
+        Cursor data = getDataBase().rawQuery(
+                "select max(" + TABLE_ALL_APPS_ORDER + ") from " + TABLE_ALL_APPS, null);
+        if (data != null) {
+            while (data.moveToNext()) {
+                rtn = data.getInt(0);
+            }
+            data.close();
+        }
+        return rtn;
+    }
+
     // ---allapps
     // +++ weather related
 

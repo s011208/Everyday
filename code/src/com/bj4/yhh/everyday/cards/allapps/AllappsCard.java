@@ -12,11 +12,13 @@ import android.content.pm.ResolveInfo;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.text.TextUtils.TruncateAt;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.MeasureSpec;
@@ -24,17 +26,28 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bj4.yhh.everyday.R;
 import com.bj4.yhh.everyday.cards.CardsRelativeLayout;
+import com.bj4.yhh.everyday.cards.weather.WeatherSettingActivity;
+import com.bj4.yhh.everyday.database.DatabaseHelper;
 
 public class AllappsCard extends CardsRelativeLayout {
-    private HorizontalScrollView mHorizontalScrollView;
+    private static final String TAG = "QQQQ";
+
+    private static final boolean DEBUG = true;
+
+    private RelativeLayout mTopLayout;
 
     private LinearLayout mAllappsContainer;
 
     private ProgressBar mProgressHint;
+
+    private ImageView mOption;
+
+    private DatabaseHelper mDatabaseHelper;
 
     public AllappsCard(Context context) {
         this(context, null);
@@ -46,17 +59,29 @@ public class AllappsCard extends CardsRelativeLayout {
 
     public AllappsCard(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        mDatabaseHelper = DatabaseHelper.getInstance(mContext);
     }
 
     @Override
     public void updateContent() {
+        new AllappsLoaderTask().execute();
     }
 
     @Override
     public void initCompoments() {
-        mHorizontalScrollView = (HorizontalScrollView)findViewById(R.id.allapps_main_container);
+        mTopLayout = (RelativeLayout)findViewById(R.id.top_layout);
         mAllappsContainer = (LinearLayout)findViewById(R.id.allapps_container);
         mProgressHint = (ProgressBar)findViewById(R.id.loading_progress);
+        mOption = (ImageView)findViewById(R.id.allapps_option);
+        mOption.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mContext, AllappsSettingActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                mContext.startActivity(intent);
+            }
+        });
         new AllappsLoaderTask().execute();
     }
 
@@ -65,13 +90,18 @@ public class AllappsCard extends CardsRelativeLayout {
 
         @Override
         protected Void doInBackground(Void... arg0) {
+            mShortCuts.addAll(mDatabaseHelper.getAllappsShortCut());
             Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
             mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
             PackageManager pm = mContext.getPackageManager();
             List<ResolveInfo> pkgAppsList = pm.queryIntentActivities(mainIntent, 0);
             for (ResolveInfo info : pkgAppsList) {
-                mShortCuts.add(new ShortCut(info.activityInfo.packageName, info.activityInfo.name,
-                        info.loadLabel(pm), info.loadIcon(pm)));
+                for (ShortCut s : mShortCuts) {
+                    if (s.isEqual(info.activityInfo.packageName, info.activityInfo.name)) {
+                        s.applyShortCutInfo(info.loadLabel(pm), info.loadIcon(pm));
+                        break;
+                    }
+                }
             }
             return null;
         }
@@ -83,39 +113,47 @@ public class AllappsCard extends CardsRelativeLayout {
 
         public void onDataUpdated() {
             mProgressHint.setVisibility(View.GONE);
-            mHorizontalScrollView.setVisibility(View.VISIBLE);
-            int shortCutSize = (int)mContext.getResources().getDimension(
-                    R.dimen.allapps_shortcut_size);
+            mTopLayout.setVisibility(View.VISIBLE);
+            mAllappsContainer.removeAllViews();
+            LayoutInflater inflater = (LayoutInflater)mContext
+                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             int iconSize = (int)mContext.getResources().getDimension(
                     R.dimen.allapps_shortcut_icon_size);
-            int iconPadding = (int)mContext.getResources().getDimension(
-                    R.dimen.allapps_shortcut_padding);
             for (final ShortCut s : mShortCuts) {
-                TextView shortcut = new TextView(mContext);
+                TextView shortcut = (TextView)inflater.inflate(R.layout.allapps_shortcut, null);
                 shortcut.setText(s.getLabel());
-                shortcut.setMaxLines(2);
-                shortcut.setEllipsize(TruncateAt.END);
-                shortcut.setPadding(iconPadding, iconPadding, iconPadding, iconPadding);
-                shortcut.setTextColor(Color.BLACK);
-                shortcut.setGravity(Gravity.CENTER);
                 shortcut.setOnClickListener(new OnClickListener() {
 
                     @Override
                     public void onClick(View v) {
-                        Intent start = new Intent();
-                        start.setComponent(new ComponentName(s.getPackageName(), s.getClassName()));
-                        start.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        mContext.startActivity(start);
+                        try {
+                            Intent start = new Intent();
+                            start.setComponent(new ComponentName(s.getPackageName(), s
+                                    .getClassName()));
+                            start.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            mContext.startActivity(start);
+                        } catch (Exception e) {
+                            startGoogleStorePage(mContext, s.getPackageName());
+                        }
                     }
                 });
                 Drawable icon = s.getIcon();
-                icon.setBounds(0, 0, iconSize, iconSize);
-                shortcut.setCompoundDrawables(null, icon, null, null);
-                LinearLayout.LayoutParams ll = new LinearLayout.LayoutParams(shortCutSize,
-                        shortCutSize);
-                mAllappsContainer.addView(shortcut, ll);
+                if (icon != null) {
+                    icon.setBounds(0, 0, iconSize, iconSize);
+                    shortcut.setCompoundDrawablesRelative(null, icon, null, null);
+                }
+                mAllappsContainer.addView(shortcut);
             }
         }
     }
 
+    public static void startGoogleStorePage(Context context, String packageName) {
+        try {
+            context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id="
+                    + packageName)));
+        } catch (android.content.ActivityNotFoundException anfe) {
+            context.startActivity(new Intent(Intent.ACTION_VIEW, Uri
+                    .parse("http://play.google.com/store/apps/details?id=" + packageName)));
+        }
+    }
 }
