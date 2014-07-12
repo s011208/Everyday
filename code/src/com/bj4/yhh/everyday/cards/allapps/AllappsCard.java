@@ -82,7 +82,7 @@ public class AllappsCard extends CardsRelativeLayout {
                 mContext.startActivity(intent);
             }
         });
-        new AllappsLoaderTask().execute();
+        new AllappsLoaderTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     class AllappsLoaderTask extends AsyncTask<Void, Void, Void> {

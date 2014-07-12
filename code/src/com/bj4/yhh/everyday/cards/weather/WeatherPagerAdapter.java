@@ -54,7 +54,7 @@ public class WeatherPagerAdapter extends PagerAdapter {
     }
 
     private void initData() {
-        new WeatherDataLoader().execute();
+        new WeatherDataLoader().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     public class WeatherDataLoader extends AsyncTask<Void, Void, Void> {
