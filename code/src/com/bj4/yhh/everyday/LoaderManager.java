@@ -6,6 +6,7 @@ import java.util.Iterator;
 
 import com.bj4.yhh.everyday.activities.MainActivity;
 import com.bj4.yhh.everyday.cards.CardsRelativeLayout;
+import com.bj4.yhh.everyday.cards.playstore.recommend.PlayStoreParser;
 import com.bj4.yhh.everyday.cards.weather.WeartherCards;
 import com.bj4.yhh.everyday.database.DatabaseHelper;
 
@@ -165,27 +166,28 @@ public class LoaderManager {
             int result = LoadingCardCallback.RESULT_FAILED;
             LayoutInflater inflater = (LayoutInflater)mContext
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            CardsRelativeLayout card = null;
             switch (mCard.getType()) {
+                case Card.CARD_TYPE_PLAY_STORE_RECOMMAND:
+                    new PlayStoreParser(mContext);
+                    break;
                 case Card.CARD_TYPE_WEATHER:
                     if (DEBUG)
                         Log.v(TAG, "create weather");
-                    CardsRelativeLayout weatherCard = (CardsRelativeLayout)inflater.inflate(
-                            R.layout.weather_card, null);
-                    weatherCard.setCardType(mCard.getType());
-                    weatherCard.setCallback(mCallbacks);
-                    mCardsContentCache.put(mCard.getId(), weatherCard);
+                    card = (CardsRelativeLayout)inflater.inflate(R.layout.weather_card, null);
                     result = LoadingCardCallback.RESULT_OK;
                     break;
                 case Card.CARD_TYPE_ALLAPPS:
                     if (DEBUG)
                         Log.v(TAG, "create weather");
-                    CardsRelativeLayout allappsCard = (CardsRelativeLayout)inflater.inflate(
-                            R.layout.allapps_card, null);
-                    allappsCard.setCardType(mCard.getType());
-                    allappsCard.setCallback(mCallbacks);
-                    mCardsContentCache.put(mCard.getId(), allappsCard);
+                    card = (CardsRelativeLayout)inflater.inflate(R.layout.allapps_card, null);
                     result = LoadingCardCallback.RESULT_OK;
                     break;
+            }
+            if (card != null) {
+                card.setCardType(mCard.getType());
+                card.setCallback(mCallbacks);
+                mCardsContentCache.put(mCard.getId(), card);
             }
             return result;
         }

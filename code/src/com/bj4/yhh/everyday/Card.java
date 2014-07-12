@@ -2,7 +2,7 @@
 package com.bj4.yhh.everyday;
 
 public class Card {
-    public static final int CARD_TYPE_NEWS = 0;
+    public static final int CARD_TYPE_PLAY_STORE_RECOMMAND = 0;
 
     public static final int CARD_TYPE_WEATHER = 1;
 

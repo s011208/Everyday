@@ -71,6 +71,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String TABLE_ALL_APPS_ORDER = "all_apps_order";
 
+    // play store recommended apps
+    
     private SQLiteDatabase mDb;
 
     private Context mContext;
@@ -118,7 +120,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SettingManager sm = SettingManager.getInstance(mContext);
         if (sm.isLoadDefault() == false) {
             // cards type
-            addNewCard(Card.CARD_TYPE_NEWS, Card.ORDER_NONE);
+            addNewCard(Card.CARD_TYPE_PLAY_STORE_RECOMMAND, Card.ORDER_NONE);
             addNewCard(Card.CARD_TYPE_WEATHER, Card.ORDER_NONE);
             addNewCard(Card.CARD_TYPE_ALLAPPS, Card.ORDER_NONE);
 
