@@ -10,5 +10,8 @@
     <dimen name="cards_padding">10dp</dimen>
     <dimen name="option_ic_padding">10dp</dimen>
     <dimen name="option_ic_size">50dp</dimen>
-
+    <!-- toast size -->
+    <dimen name="toast_img_size">40dp</dimen>
+    <dimen name="toast_y_offset">50dp</dimen>
+    <dimen name="toast_image_margin_bottom">10dp</dimen>
 </resources>

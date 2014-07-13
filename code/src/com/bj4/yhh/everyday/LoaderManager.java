@@ -82,14 +82,7 @@ public class LoaderManager {
                 Bundle extra = intent.getExtras();
                 if (extra != null) {
                     int cardType = extra.getInt(INTENT_EXTRA_UPDATE_TYPE);
-                    Iterator<CardsRelativeLayout> iter = mCardsContentCache.snapshot().values()
-                            .iterator();
-                    while (iter.hasNext()) {
-                        CardsRelativeLayout card = iter.next();
-                        if (card.getCardType() == cardType) {
-                            card.updateContent();
-                        }
-                    }
+                    updateCard(cardType);
                 }
             }
         }
@@ -107,9 +100,28 @@ public class LoaderManager {
         mContext.unregisterReceiver(mReceiver);
     }
 
+    private void updateCard(int cardType) {
+        Iterator<CardsRelativeLayout> iter = mCardsContentCache.snapshot().values().iterator();
+        while (iter.hasNext()) {
+            CardsRelativeLayout card = iter.next();
+            if (card.getCardType() == cardType) {
+                card.updateContent();
+            }
+        }
+    }
+
+    private void updateAllCards() {
+        Iterator<CardsRelativeLayout> iter = mCardsContentCache.snapshot().values().iterator();
+        while (iter.hasNext()) {
+            CardsRelativeLayout card = iter.next();
+            card.updateContent();
+        }
+    }
+
     public void forceReload() {
         mCards.clear();
         mCards.addAll(mDatabaseHelper.getCards());
+        updateAllCards();
         if (mCallbacks != null) {
             mCallbacks.dataLoadingDone();
         }

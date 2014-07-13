@@ -7,23 +7,34 @@ import com.bj4.yhh.everyday.R;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.MeasureSpec;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 
 public class MainActivity extends Activity implements LoaderManager.Callback {
+    private static final boolean DEBUG = true;
+
+    private static final String TAG = "QQQQ";
 
     private LoaderManager mLoaderManager;
 
     private ListView mCardList;
 
     private CardListAdapter mCardListAdapter;
+
+    private SwipeRefreshLayout mRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +79,19 @@ public class MainActivity extends Activity implements LoaderManager.Callback {
                     }
                 });
         mCardList.setAdapter(mCardListAdapter);
+        mRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swipe_container);
+        mRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
+
+            @Override
+            public void onRefresh() {
+                if (mLoaderManager != null) {
+                    mLoaderManager.forceReload();
+                }
+            }
+        });
+        mRefreshLayout.setColorScheme(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light, android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
     }
 
     private void forceReload() {
@@ -79,6 +103,7 @@ public class MainActivity extends Activity implements LoaderManager.Callback {
     @Override
     public void dataLoadingDone() {
         forceReload();
+        mRefreshLayout.setRefreshing(false);
     }
 
     public void setListViewHeightBasedOnChildren() {
@@ -101,4 +126,5 @@ public class MainActivity extends Activity implements LoaderManager.Callback {
         mCardList.setLayoutParams(params);
         mCardList.requestLayout();
     }
+
 }
