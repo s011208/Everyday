@@ -4,12 +4,15 @@ package com.bj4.yhh.everyday.activities;
 import com.bj4.yhh.everyday.EverydayApplication;
 import com.bj4.yhh.everyday.LoaderManager;
 import com.bj4.yhh.everyday.R;
+import com.bj4.yhh.everyday.services.CitiesLoadingService;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.MeasureSpec;
@@ -43,11 +46,18 @@ public class MainActivity extends Activity implements LoaderManager.Callback {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        startPreloadService();
         init();
+    }
+
+    private void startPreloadService() {
+        Intent intent = new Intent(this, CitiesLoadingService.class);
+        startService(intent);
     }
 
     protected void onResume() {
         super.onResume();
+        forceReload();
         mLoaderManager.addCallback(this);
     }
 
@@ -58,7 +68,6 @@ public class MainActivity extends Activity implements LoaderManager.Callback {
 
     private void init() {
         initBasic();
-        forceReload();
         initCardsList();
     }
 

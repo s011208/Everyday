@@ -6,7 +6,10 @@ import java.util.ArrayList;
 import com.bj4.yhh.everyday.Card;
 import com.bj4.yhh.everyday.LoaderManager;
 import com.bj4.yhh.everyday.R;
+import com.bj4.yhh.everyday.activities.MainActivity;
 import com.bj4.yhh.everyday.database.DatabaseHelper;
+import com.bj4.yhh.everyday.services.CitiesLoadingService;
+import com.bj4.yhh.everyday.services.ICitiesLoading;
 
 import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
@@ -14,8 +17,10 @@ import android.animation.ValueAnimator;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
 import android.app.Activity;
 import android.content.ClipData;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Point;
@@ -24,6 +29,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.RemoteException;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.KeyEvent;
@@ -58,6 +65,10 @@ public class WeatherSettingActivity extends Activity {
 
     private static ArrayList<String> sAllCities;
 
+    private final Object mAllCitiesSync = new Object();
+
+    private boolean mIsPreloading = false;
+
     private TextView mProgressTxt;
 
     private ImageView mAddNewCity, mRemoveCity;
@@ -77,6 +88,18 @@ public class WeatherSettingActivity extends Activity {
 
     private boolean mAcceptDropDelete = false;
 
+    private ICitiesLoading mService;
+
+    private ServiceConnection mConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            mService = ICitiesLoading.Stub.asInterface(service);
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            mService = null;
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -87,20 +110,67 @@ public class WeatherSettingActivity extends Activity {
         init();
     }
 
+    private ICitiesLoading getService() {
+        if (mService == null) {
+            bindService();
+        }
+        return mService;
+    }
+
     public void onResume() {
         super.onResume();
         if (sAllCities == null) {
+            Log.d(TAG, "onResume sAllCities == null");
             new DataLoaderTask().execute();
         } else {
+            Log.d(TAG, "onResume refreshContent");
             refreshContent();
+        }
+    }
+
+    public void onDestroy() {
+        try {
+            unbindService(mConnection);
+        } catch (Exception e) {
+        }
+        super.onDestroy();
+    }
+
+    public void onBackPressed() {
+        if (mIsPreloading) {
+            startActivity(new Intent(this, MainActivity.class));
+        } else {
+            super.onBackPressed();
         }
     }
 
     private class DataLoaderTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
-            sAllCities = mDatabaseHelper.getAllCitiesName();
-            System.gc();
+            mIsPreloading = true;
+            while (getService() == null) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                }
+            }
+            synchronized (mAllCitiesSync) {
+                if (sAllCities == null) {
+                    try {
+                        if (getService().isLoading() == false) {
+                            Log.d(TAG, "getService().isLoading() == false");
+                            sAllCities = mDatabaseHelper.getAllCitiesName();
+                            System.gc();
+                        } else {
+                            Log.d(TAG, "sAllCities = null;");
+                            sAllCities = null;
+                        }
+                    } catch (RemoteException e) {
+                        Log.w(TAG, "failed", e);
+                        sAllCities = null;
+                    }
+                }
+            }
             return null;
         }
 
@@ -260,19 +330,28 @@ public class WeatherSettingActivity extends Activity {
 
                 @Override
                 protected Void doInBackground(Void... params) {
-                    mDatabaseHelper.loadCitiesTable(new DatabaseHelper.ProgressCallback() {
-
-                        @Override
-                        public void progress(final int progress) {
+                    try {
+                        mIsPreloading = true;
+                        while (getService() == null) {
+                            Thread.sleep(100);
+                        }
+                        while (getService().isLoading()) {
                             runOnUiThread(new Runnable() {
 
                                 @Override
                                 public void run() {
-                                    mProgressTxt.setText(progress + " %");
+                                    try {
+                                        mProgressTxt.setText(getService().getLoadingProgress()
+                                                + " %");
+                                    } catch (RemoteException e) {
+                                    }
                                 }
                             });
+                            Thread.sleep(100);
                         }
-                    });
+                    } catch (Exception e) {
+                        Log.w(TAG, "failed", e);
+                    }
                     return null;
                 }
 
@@ -282,6 +361,12 @@ public class WeatherSettingActivity extends Activity {
                 }
             }.execute();
         }
+    }
+
+    private void bindService() {
+        Intent intent = new Intent(this, CitiesLoadingService.class);
+        startService(intent);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
     private void updateWeatherCards() {
@@ -414,6 +499,8 @@ public class WeatherSettingActivity extends Activity {
     }
 
     private void refreshContent() {
+        if (sAllCities == null)
+            return;
         if (mLoadingView != null) {
             mLoadingView.setVisibility(View.GONE);
         }
@@ -424,5 +511,6 @@ public class WeatherSettingActivity extends Activity {
                 R.layout.auto_complete_item_view, sAllCities);
         mAutoCompleteCity.setAdapter(citiesAdapter);
         mCityListAdapter.notifyDataSetChanged();
+        mIsPreloading = false;
     }
 }

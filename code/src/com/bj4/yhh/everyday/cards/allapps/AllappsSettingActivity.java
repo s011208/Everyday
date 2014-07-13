@@ -10,6 +10,7 @@ import com.bj4.yhh.everyday.Card;
 import com.bj4.yhh.everyday.LoaderManager;
 import com.bj4.yhh.everyday.R;
 import com.bj4.yhh.everyday.database.DatabaseHelper;
+import com.bj4.yhh.everyday.utils.MagicFuzzy;
 
 import android.app.Activity;
 import android.content.Context;
@@ -21,6 +22,11 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.TextWatcher;
+import android.text.style.BackgroundColorSpan;
 import android.util.Log;
 import android.util.LruCache;
 import android.util.SparseArray;
@@ -34,6 +40,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -44,6 +51,8 @@ public class AllappsSettingActivity extends Activity {
     private AllappsListAdapter mAllappsListAdapter;
 
     private boolean mHasUpdate = false;
+
+    private EditText mSearchingText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +65,24 @@ public class AllappsSettingActivity extends Activity {
     }
 
     private void init() {
+        mSearchingText = (EditText)findViewById(R.id.searching_txt);
+        mSearchingText.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void afterTextChanged(Editable arg0) {
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
+                if (mAllappsListAdapter != null) {
+                    mAllappsListAdapter.setSearchingText(arg0.toString());
+                }
+            }
+        });
         mAllappsList = (ListView)findViewById(R.id.allapps_list);
         mAllappsListAdapter = new AllappsListAdapter(this);
         mAllappsList.setAdapter(mAllappsListAdapter);
@@ -96,6 +123,8 @@ public class AllappsSettingActivity extends Activity {
 
         private List<ResolveInfo> mPkgAppsList = new ArrayList<ResolveInfo>();
 
+        private List<ResolveInfo> mShowingPkgAppsList = new ArrayList<ResolveInfo>();
+
         private SparseArray<Boolean> mCheckedList = new SparseArray<Boolean>();
 
         private PackageManager mPackageManager;
@@ -103,6 +132,8 @@ public class AllappsSettingActivity extends Activity {
         private DatabaseHelper mDatabaseHelper;
 
         private int mIconSize;
+
+        private String mSearchingText;
 
         public AllappsListAdapter(Context context) {
             mContext = context;
@@ -116,34 +147,63 @@ public class AllappsSettingActivity extends Activity {
             initData();
         }
 
-        private void initData() {
-            Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
-            mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-            mPkgAppsList = mPackageManager.queryIntentActivities(mainIntent, 0);
-            Collections.sort(mPkgAppsList, new Comparator<ResolveInfo>() {
-
-                @Override
-                public int compare(ResolveInfo arg0, ResolveInfo arg1) {
-                    String info0 = mLabelCache.get(arg0.activityInfo.name);
-                    if (info0 == null) {
-                        info0 = (String)arg0.activityInfo.loadLabel(mPackageManager);
-                        mLabelCache.put(arg0.activityInfo.name, info0);
-                    }
-                    String info1 = mLabelCache.get(arg1.activityInfo.name);
-                    if (info1 == null) {
-                        info1 = (String)arg1.activityInfo.loadLabel(mPackageManager);
-                        mLabelCache.put(arg1.activityInfo.name, info1);
-                    }
-                    return info0.compareTo(info1);
+        public void setSearchingText(String txt) {
+            if (txt != null && "".equals(txt.trim()) == false) {
+                mSearchingText = txt.toLowerCase();
+                notifyDataSetChanged();
+            } else {
+                if (mSearchingText != null) {
+                    mSearchingText = null;
+                    notifyDataSetChanged();
                 }
-            });
+            }
+        }
+
+        private void initData() {
+            if (mPkgAppsList.isEmpty()) {
+                Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
+                mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+                mPkgAppsList = mPackageManager.queryIntentActivities(mainIntent, 0);
+                Collections.sort(mPkgAppsList, new Comparator<ResolveInfo>() {
+
+                    @Override
+                    public int compare(ResolveInfo arg0, ResolveInfo arg1) {
+                        String info0 = mLabelCache.get(arg0.activityInfo.name);
+                        if (info0 == null) {
+                            info0 = (String)arg0.activityInfo.loadLabel(mPackageManager);
+                            mLabelCache.put(arg0.activityInfo.name, info0);
+                        }
+                        String info1 = mLabelCache.get(arg1.activityInfo.name);
+                        if (info1 == null) {
+                            info1 = (String)arg1.activityInfo.loadLabel(mPackageManager);
+                            mLabelCache.put(arg1.activityInfo.name, info1);
+                        }
+                        return info0.compareTo(info1);
+                    }
+                });
+            }
+            mShowingPkgAppsList.clear();
+            if (mSearchingText != null) {
+                for (ResolveInfo info : mPkgAppsList) {
+                    String label = mLabelCache.get(info.activityInfo.name);
+                    if (label == null) {
+                        label = (String)info.activityInfo.loadLabel(mPackageManager);
+                        mLabelCache.put(info.activityInfo.name, label);
+                    }
+                    if (MagicFuzzy.Magic(label.toLowerCase(), mSearchingText, 0)) {
+                        mShowingPkgAppsList.add(info);
+                    }
+                }
+            } else {
+                mShowingPkgAppsList.addAll(mPkgAppsList);
+            }
             mCheckedList.clear();
             ArrayList<ShortCut> shortCuts = new ArrayList<ShortCut>();
             shortCuts.addAll(mDatabaseHelper.getAllappsShortCut());
-            for (int i = 0; i < mPkgAppsList.size(); i++) {
+            for (int i = 0; i < mShowingPkgAppsList.size(); i++) {
                 boolean hasFind = false;
                 for (ShortCut s : shortCuts) {
-                    ResolveInfo info = mPkgAppsList.get(i);
+                    ResolveInfo info = mShowingPkgAppsList.get(i);
                     if (s.isEqual(info.activityInfo.packageName, info.activityInfo.name)) {
                         hasFind = true;
                         break;
@@ -180,12 +240,12 @@ public class AllappsSettingActivity extends Activity {
 
         @Override
         public int getCount() {
-            return mPkgAppsList.size();
+            return mShowingPkgAppsList.size();
         }
 
         @Override
         public ResolveInfo getItem(int position) {
-            return mPkgAppsList.get(position);
+            return mShowingPkgAppsList.get(position);
         }
 
         @Override
@@ -212,7 +272,13 @@ public class AllappsSettingActivity extends Activity {
                 label = (String)info.loadLabel(mPackageManager);
                 mLabelCache.put(className, label);
             }
-            holder.mLabel.setText(label);
+            if (mSearchingText != null) {
+                SpannableString msp = new SpannableString(label);
+                getSpannableString(label, msp, mSearchingText);
+                holder.mLabel.setText(msp);
+            } else {
+                holder.mLabel.setText(label);
+            }
             Bitmap bitmap = mIconCache.get(className);
             if (bitmap == null) {
                 Drawable icon = info.loadIcon(mPackageManager);
@@ -237,6 +303,16 @@ public class AllappsSettingActivity extends Activity {
             ImageView mIcon;
 
             TextView mLabel;
+        }
+
+        private static boolean getSpannableString(String label, SpannableString msp,
+                String searchingText) {
+            int index = label.toLowerCase().indexOf(searchingText);
+            if (index != -1) {
+                msp.setSpan(new BackgroundColorSpan(0x66e1e100), index,
+                        index + searchingText.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+            }
+            return index != -1;
         }
     }
 }

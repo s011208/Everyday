@@ -44,7 +44,11 @@
 
         <service
             android:name="com.bj4.yhh.everyday.services.UpdateDataService"
-            android:process=":update_service" >
+            android:process=":service" >
+        </service>
+        <service
+            android:name="com.bj4.yhh.everyday.services.CitiesLoadingService"
+            android:process=":service" >
         </service>
     </application>
 
