@@ -10,6 +10,7 @@ import java.util.Collections;
 import com.bj4.yhh.everyday.Card;
 import com.bj4.yhh.everyday.SettingManager;
 import com.bj4.yhh.everyday.cards.allapps.ShortCut;
+import com.bj4.yhh.everyday.cards.playstore.recommend.PlayStoreItem;
 import com.bj4.yhh.everyday.cards.weather.City;
 
 import android.content.ContentValues;
@@ -72,7 +73,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TABLE_ALL_APPS_ORDER = "all_apps_order";
 
     // play store recommended apps
-    
+    private static final String TABLE_PLAY_STORE = "play_store";
+
+    private static final String TABLE_PLAY_STORE_LIST_TYPE = "list_type";
+
+    private static final String TABLE_PLAY_STORE_IMG_URL = "image_url";
+
+    private static final String TABLE_PLAY_STORE_APP_URL = "app_url";
+
+    private static final String TABLE_PLAY_STORE_APP_NAME = "app_name";
+
     private SQLiteDatabase mDb;
 
     private Context mContext;
@@ -132,7 +142,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             // allapps shortcuts
             addNewAllappsShortCut("com.asus.message", "com.android.mms.ui.ConversationList");
-            addNewAllappsShortCut("com.asus.filemanager", "com.asus.filemanager.activity.FileManagerActivity");
+            addNewAllappsShortCut("com.asus.filemanager",
+                    "com.asus.filemanager.activity.FileManagerActivity");
             addNewAllappsShortCut("com.asus.browser", "com.android.browser.BrowserActivity");
         }
     }
@@ -159,7 +170,67 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "CREATE TABLE IF NOT EXISTS " + TABLE_ALL_APPS + "(" + TABLE_ALL_APPS_ID
                         + " INTEGER PRIMARY KEY AUTOINCREMENT, " + TABLE_ALL_APPS_PKG + " TEXT, "
                         + TABLE_ALL_APPS_CLZ + " TEXT, " + TABLE_ALL_APPS_ORDER + " INTEGER)");
+
+        // play store
+        getDataBase().execSQL(
+                "CREATE TABLE IF NOT EXISTS " + TABLE_PLAY_STORE + "(" + TABLE_PLAY_STORE_LIST_TYPE
+                        + " TEXT, " + TABLE_PLAY_STORE_IMG_URL + " TEXT, "
+                        + TABLE_PLAY_STORE_APP_URL + " TEXT, " + TABLE_PLAY_STORE_APP_NAME
+                        + " TEXT)");
     }
+
+    // +++play store
+    public int getPlayStoreListTypeCount() {
+        int rtn = 0;
+        Cursor data = getDataBase().rawQuery(
+                "select count(distinct " + TABLE_PLAY_STORE_LIST_TYPE + ") from "
+                        + TABLE_PLAY_STORE, null);
+        if (data != null) {
+            data.moveToNext();
+            rtn = data.getInt(0);
+            data.close();
+        }
+        return rtn;
+    }
+
+    public ArrayList<PlayStoreItem> getPlayStoreItems() {
+        ArrayList<PlayStoreItem> rtn = new ArrayList<PlayStoreItem>();
+        Cursor data = getDataBase().query(
+                TABLE_PLAY_STORE,
+                new String[] {
+                        TABLE_PLAY_STORE_LIST_TYPE, TABLE_PLAY_STORE_IMG_URL,
+                        TABLE_PLAY_STORE_APP_URL, TABLE_PLAY_STORE_APP_NAME
+                }, null, null, null, null, null);
+        if (data != null) {
+            while (data.moveToNext()) {
+                rtn.add(new PlayStoreItem(data.getString(2), data.getString(1), data.getString(0),
+                        data.getString(3)));
+            }
+            data.close();
+        }
+        return rtn;
+    }
+
+    public void addPlayStoreItems(ArrayList<PlayStoreItem> items) {
+        getDataBase().delete(TABLE_PLAY_STORE, null, null);
+        getDataBase().beginTransaction();
+        try {
+            for (PlayStoreItem item : items) {
+                ContentValues cv = new ContentValues();
+                cv.put(TABLE_PLAY_STORE_APP_NAME, item.getAppName());
+                cv.put(TABLE_PLAY_STORE_APP_URL, item.getAppUrl());
+                cv.put(TABLE_PLAY_STORE_IMG_URL, item.getImgUrl());
+                cv.put(TABLE_PLAY_STORE_LIST_TYPE, item.getListType());
+                getDataBase().insertOrThrow(TABLE_PLAY_STORE, null, cv);
+            }
+            getDataBase().setTransactionSuccessful();
+        } finally {
+            getDataBase().endTransaction();
+            System.gc();
+        }
+    }
+
+    // ---play store
 
     // +++allapps
     public ArrayList<ShortCut> getAllappsShortCut() {

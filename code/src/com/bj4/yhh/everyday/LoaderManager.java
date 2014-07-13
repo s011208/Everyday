@@ -6,7 +6,7 @@ import java.util.Iterator;
 
 import com.bj4.yhh.everyday.activities.MainActivity;
 import com.bj4.yhh.everyday.cards.CardsRelativeLayout;
-import com.bj4.yhh.everyday.cards.playstore.recommend.PlayStoreParser;
+import com.bj4.yhh.everyday.cards.playstore.recommend.PlayStoreCard;
 import com.bj4.yhh.everyday.cards.weather.WeartherCards;
 import com.bj4.yhh.everyday.database.DatabaseHelper;
 
@@ -169,7 +169,8 @@ public class LoaderManager {
             CardsRelativeLayout card = null;
             switch (mCard.getType()) {
                 case Card.CARD_TYPE_PLAY_STORE_RECOMMAND:
-                    new PlayStoreParser(mContext);
+                    card = (CardsRelativeLayout)inflater.inflate(R.layout.play_store_card, null);
+                    result = LoadingCardCallback.RESULT_OK;
                     break;
                 case Card.CARD_TYPE_WEATHER:
                     if (DEBUG)

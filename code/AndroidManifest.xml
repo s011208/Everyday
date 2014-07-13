@@ -41,6 +41,11 @@
             android:launchMode="singleTask"
             android:process=":setting" >
         </activity>
+
+        <service
+            android:name="com.bj4.yhh.everyday.services.UpdateDataService"
+            android:process=":update_service" >
+        </service>
     </application>
 
 </manifest>

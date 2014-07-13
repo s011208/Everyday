@@ -1,0 +1,26 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <ImageView
+        android:id="@+id/play_store_app_img"
+        android:layout_width="@dimen/play_store_app_preview_img_size"
+        android:layout_height="@dimen/play_store_app_preview_img_size"
+        android:layout_gravity="center"
+        android:layout_marginLeft="@dimen/play_store_items_space"
+        android:layout_marginRight="@dimen/play_store_items_space"
+        android:scaleType="centerInside" />
+
+    <TextView
+        android:id="@+id/play_store_app_name"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:maxLines="1"
+        android:textColor="#000" />
+
+</LinearLayout>

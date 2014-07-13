@@ -1,0 +1,24 @@
+<com.bj4.yhh.everyday.cards.playstore.recommend.PlayStoreCard xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <LinearLayout
+        android:id="@+id/top_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="invisible" >
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/loading_progress"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="@dimen/main_progress_circle_size"
+        android:layout_height="@dimen/main_progress_circle_size"
+        android:layout_centerInParent="true"
+        android:layout_gravity="center"
+        android:indeterminate="true"
+        android:indeterminateBehavior="repeat" />
+
+</com.bj4.yhh.everyday.cards.playstore.recommend.PlayStoreCard>
