@@ -44,9 +44,9 @@
             android:layout_centerVertical="true"
             android:padding="2dp"
             android:layout_marginBottom="@dimen/setting_view_margin_v"
-            android:layout_marginLeft="@dimen/setting_view_margin_h"
+            android:layout_marginRight="@dimen/setting_view_margin_h"
             android:layout_marginTop="@dimen/setting_view_margin_v"
-            android:background="#bbffffff"
+            android:background="#ddffffff"
             android:divider="@android:color/black"
             android:dividerHeight="2dip" >
         </ListView>

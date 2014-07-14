@@ -11,15 +11,8 @@
         android:id="@+id/main_option"
         android:layout_width="@dimen/option_ic_size"
         android:layout_height="@dimen/option_ic_size"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="5dp" >
-
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="@dimen/option_ic_padding"
-            android:scaleType="centerInside"
-            android:src="@drawable/ic_arrow_to_left" />
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="5dp" >
 
         <ImageView
             android:layout_width="match_parent"
@@ -27,6 +20,13 @@
             android:padding="@dimen/option_ic_padding"
             android:scaleType="centerInside"
             android:src="@drawable/ic_arrow_to_right" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="@dimen/option_ic_padding"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_arrow_to_left" />
     </ViewSwitcher>
 
 </com.bj4.yhh.everyday.activities.utils.MainActionBar>

@@ -108,7 +108,7 @@ public class MainActivity extends Activity implements LoaderManager.Callback {
             }
         });
         mSettingView = (MainSettingView)findViewById(R.id.main_setting_parent);
-        mSettingView.setPivotX(getResources().getConfiguration().screenWidthDp * 2);
+        mSettingView.setPivotX(0);
         mSettingViewAnimator = ValueAnimator.ofFloat(0, 1);
         mSettingViewAnimator.setDuration(300);
         mSettingViewAnimator.addUpdateListener(new AnimatorUpdateListener() {
