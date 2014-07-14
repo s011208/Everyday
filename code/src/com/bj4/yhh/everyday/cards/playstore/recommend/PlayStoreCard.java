@@ -12,6 +12,7 @@ import com.bj4.yhh.everyday.cards.CardsRelativeLayout.ContentLoadingCallback;
 import com.bj4.yhh.everyday.cards.allapps.AllappsCard;
 import com.bj4.yhh.everyday.database.DatabaseHelper;
 import com.bj4.yhh.everyday.services.UpdateDataService;
+import com.bj4.yhh.everyday.utils.Utils;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 
 import android.content.Context;
@@ -125,10 +126,17 @@ public class PlayStoreCard extends CardsRelativeLayout {
 
                         @Override
                         public void onClick(View arg0) {
-                            AllappsCard.startGoogleStorePage(
-                                    mContext,
-                                    item.getAppUrl().substring(
-                                            item.getAppUrl().lastIndexOf("=") + 1));
+                            if (item.getAppUrl().startsWith("/store/books/")) {
+                                Intent i = new Intent(Intent.ACTION_VIEW, Uri
+                                        .parse("https://play.google.com" + item.getAppUrl()))
+                                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                mContext.startActivity(i);
+                            } else {
+                                Utils.startGoogleStorePage(
+                                        mContext,
+                                        item.getAppUrl().substring(
+                                                item.getAppUrl().lastIndexOf("=") + 1));
+                            }
                         }
                     });
                     container.addView(itemView);

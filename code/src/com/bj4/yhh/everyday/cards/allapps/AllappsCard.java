@@ -34,6 +34,7 @@ import com.bj4.yhh.everyday.cards.CardsRelativeLayout;
 import com.bj4.yhh.everyday.cards.CardsRelativeLayout.ContentLoadingCallback;
 import com.bj4.yhh.everyday.cards.weather.WeatherSettingActivity;
 import com.bj4.yhh.everyday.database.DatabaseHelper;
+import com.bj4.yhh.everyday.utils.Utils;
 
 public class AllappsCard extends CardsRelativeLayout {
     private static final String TAG = "QQQQ";
@@ -136,7 +137,7 @@ public class AllappsCard extends CardsRelativeLayout {
                             start.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             mContext.startActivity(start);
                         } catch (Exception e) {
-                            startGoogleStorePage(mContext, s.getPackageName());
+                            Utils.startGoogleStorePage(mContext, s.getPackageName());
                         }
                     }
                 });
@@ -147,17 +148,6 @@ public class AllappsCard extends CardsRelativeLayout {
                 }
                 mAllappsContainer.addView(shortcut);
             }
-        }
-    }
-
-    public static void startGoogleStorePage(Context context, String packageName) {
-        try {
-            context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id="
-                    + packageName)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-        } catch (android.content.ActivityNotFoundException anfe) {
-            context.startActivity(new Intent(Intent.ACTION_VIEW, Uri
-                    .parse("http://play.google.com/store/apps/details?id=" + packageName))
-                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         }
     }
 }
