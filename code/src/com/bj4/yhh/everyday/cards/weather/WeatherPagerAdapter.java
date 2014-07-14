@@ -11,6 +11,7 @@ import com.bj4.yhh.everyday.Card;
 import com.bj4.yhh.everyday.LoaderManager;
 import com.bj4.yhh.everyday.R;
 import com.bj4.yhh.everyday.database.DatabaseHelper;
+import com.bj4.yhh.everyday.utils.ToastHelper;
 import com.bj4.yhh.everyday.utils.Utils;
 
 import android.content.Context;
@@ -60,6 +61,8 @@ public class WeatherPagerAdapter extends PagerAdapter {
     public class WeatherDataLoader extends AsyncTask<Void, Void, Void> {
         private ArrayList<WeatherData> data = new ArrayList<WeatherData>();
 
+        boolean mHasFailed = false;
+
         @Override
         protected Void doInBackground(Void... arg0) {
             ArrayList<Integer> cityIds = mDatabaseHelper.getWeatherCards();
@@ -70,7 +73,11 @@ public class WeatherPagerAdapter extends PagerAdapter {
             if (DEBUG)
                 Log.d(TAG, "parseOnInternet, url: " + url + ", cityIds size: " + cityIds.size());
             final String stream = Utils.parseOnInternet(url);
-            processWeatherData(stream);
+            if ("".equals(stream)) {
+                mHasFailed = true;
+            } else {
+                processWeatherData(stream);
+            }
             if (DEBUG)
                 Log.d(TAG, stream);
             return null;
@@ -78,14 +85,18 @@ public class WeatherPagerAdapter extends PagerAdapter {
 
         @Override
         protected void onPostExecute(Void result) {
-            mData.clear();
-            mData.addAll(data);
-            if (mData.size() == 0) {
-                mCachedView.evictAll();
+            if (mHasFailed) {
+                ToastHelper.makeToast(mContext, ToastHelper.TOAST_TYPE_LOADING_DATA_FAILED).show();
+            } else {
+                mData.clear();
+                mData.addAll(data);
+                if (mData.size() == 0) {
+                    mCachedView.evictAll();
+                }
+                if (DEBUG)
+                    Log.i(TAG, "parse done");
             }
             notifyDataSetChanged();
-            if (DEBUG)
-                Log.i(TAG, "parse done");
         }
 
         /**

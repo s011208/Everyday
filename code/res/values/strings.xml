@@ -6,5 +6,6 @@
     <string name="action_settings">Settings</string>
     <string name="loading">Loading...</string>
     <string name="none_data_hint">Please add some data</string>
+    <string name="toast_type_loading_data_failed">Loading data failed</string>
 
 </resources>

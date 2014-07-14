@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 public class ToastHelper {
 
-    public static final int TOAST_TYPE_START_LOAD = 0;
+    public static final int TOAST_TYPE_LOADING_DATA_FAILED = 0;
 
     public static final Toast makeToast(Context context, int type) {
         Toast rtn = new Toast(context);
@@ -23,9 +23,9 @@ public class ToastHelper {
         ImageView img = (ImageView)parent.findViewById(R.id.toast_icon);
         TextView txt = (TextView)parent.findViewById(R.id.toast_text);
         switch (type) {
-            case TOAST_TYPE_START_LOAD:
-                // img.setImageResource(R.drawable.toast_start_update_icon);
-                // txt.setText(R.string.toast_start_loading);
+            case TOAST_TYPE_LOADING_DATA_FAILED:
+                img.setImageResource(R.drawable.toast_fail_icon);
+                txt.setText(R.string.toast_type_loading_data_failed);
                 break;
         }
         rtn.setView(parent);

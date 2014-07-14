@@ -13,6 +13,7 @@ import com.bj4.yhh.everyday.Card;
 import com.bj4.yhh.everyday.LoaderManager;
 import com.bj4.yhh.everyday.cards.playstore.recommend.PlayStoreItem;
 import com.bj4.yhh.everyday.database.DatabaseHelper;
+import com.bj4.yhh.everyday.utils.ToastHelper;
 
 import android.app.Service;
 import android.content.Intent;
@@ -58,6 +59,7 @@ public class UpdateDataService extends Service {
     }
 
     public class ParserTask extends AsyncTask<Void, Void, Void> {
+        boolean mHasFailed = false;
 
         @Override
         protected Void doInBackground(Void... arg0) {
@@ -87,12 +89,17 @@ public class UpdateDataService extends Service {
             } catch (IOException e) {
                 if (DEBUG)
                     Log.w(TAG, "failed", e);
+                mHasFailed = true;
             }
             return null;
         }
 
         @Override
         protected void onPostExecute(Void result) {
+            if (mHasFailed) {
+                ToastHelper.makeToast(getApplicationContext(),
+                        ToastHelper.TOAST_TYPE_LOADING_DATA_FAILED).show();
+            }
             updatePlayStoreCards();
         }
 

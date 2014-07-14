@@ -1,6 +1,6 @@
 <resources>
 
-    <dimen name="play_store_app_preview_img_size">70dp</dimen>
+    <dimen name="play_store_app_preview_img_size">60dp</dimen>
     <dimen name="play_store_list_space">15dp</dimen>
     <dimen name="play_store_items_space">5dp</dimen>
     <dimen name="play_store_list_text_size">18sp</dimen>

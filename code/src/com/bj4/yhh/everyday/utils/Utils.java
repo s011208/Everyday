@@ -32,6 +32,7 @@ public class Utils {
             try {
                 is.close();
             } catch (Exception ioe) {
+                return "";
             }
         }
         return sb.toString();
