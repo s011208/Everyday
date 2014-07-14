@@ -43,6 +43,8 @@ public class PlayStoreCard extends CardsRelativeLayout {
 
     private static final String TAG = "QQQQ";
 
+    private static final int SWITCH_ANIMATION_INTERVAL = 5000;
+
     private DatabaseHelper mDatabaseHelper;
 
     private ArrayList<PlayStoreItem> mData;
@@ -61,14 +63,17 @@ public class PlayStoreCard extends CardsRelativeLayout {
 
     private ValueAnimator mSwitchViewHelper;
 
+    private int mAnimationType = 0;
+
     private Runnable mUpdateContentRunnable = new Runnable() {
         @Override
         public void run() {
             if (mContainers.size() > 0) {
                 ++mCurrentIndicator;
+                mAnimationType = ((int)(Math.random() * 100) % 3);
                 mSwitchViewHelper.start();
                 mHandler.removeCallbacks(mUpdateContentRunnable);
-                mHandler.postDelayed(mUpdateContentRunnable, 5000);
+                mHandler.postDelayed(mUpdateContentRunnable, SWITCH_ANIMATION_INTERVAL);
             }
         }
     };
@@ -90,7 +95,7 @@ public class PlayStoreCard extends CardsRelativeLayout {
             mHandler.removeCallbacks(mUpdateContentRunnable);
         } else if (ev.getAction() == MotionEvent.ACTION_UP) {
             mHandler.removeCallbacks(mUpdateContentRunnable);
-            mHandler.postDelayed(mUpdateContentRunnable, 5000);
+            mHandler.postDelayed(mUpdateContentRunnable, SWITCH_ANIMATION_INTERVAL);
         }
         super.dispatchTouchEvent(ev);
         return true;
@@ -115,14 +120,34 @@ public class PlayStoreCard extends CardsRelativeLayout {
                     int nextIndex = (int)(mCurrentIndicator % mContainers.size());
                     if (currentIndex != nextIndex) {
                         if (value == 0) {
-                            mContainers.get(nextIndex).setScaleX(0);
+                            if (mAnimationType == 0) {
+                                mContainers.get(nextIndex).setScaleX(0);
+                                mContainers.get(nextIndex).setAlpha(1);
+                                mContainers.get(nextIndex).setScaleY(1);
+                            } else if (mAnimationType == 1) {
+                                mContainers.get(nextIndex).setScaleY(0);
+                                mContainers.get(nextIndex).setAlpha(1);
+                                mContainers.get(nextIndex).setScaleX(1);
+                            } else if (mAnimationType == 2) {
+                                mContainers.get(nextIndex).setAlpha(0);
+                                mContainers.get(nextIndex).setScaleX(1);
+                                mContainers.get(nextIndex).setScaleY(1);
+                            }
                             mContainers.get(nextIndex).setVisibility(View.VISIBLE);
                             mContainers.get(nextIndex).bringToFront();
                         } else if (value == 1) {
                             mContainers.get(currentIndex).setVisibility(View.GONE);
                         } else {
-                            mContainers.get(nextIndex).setScaleX(value);
-                            mContainers.get(currentIndex).setScaleX(1 - value);
+                            if (mAnimationType == 0) {
+                                mContainers.get(nextIndex).setScaleX(value);
+                                mContainers.get(currentIndex).setScaleX(1 - value);
+                            } else if (mAnimationType == 1) {
+                                mContainers.get(nextIndex).setScaleY(value);
+                                mContainers.get(currentIndex).setScaleY(1 - value);
+                            } else if (mAnimationType == 2) {
+                                mContainers.get(nextIndex).setAlpha(value);
+                                mContainers.get(currentIndex).setAlpha(1 - value);
+                            }
                         }
                     }
                 }

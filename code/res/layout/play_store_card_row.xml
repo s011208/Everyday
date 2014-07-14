@@ -16,6 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="@dimen/play_store_list_space"
+        android:padding="@dimen/play_store_h_scrollview_padding"
         android:scrollbars="none" >
 
         <LinearLayout
