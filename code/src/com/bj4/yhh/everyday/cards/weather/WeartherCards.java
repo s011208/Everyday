@@ -4,6 +4,7 @@ package com.bj4.yhh.everyday.cards.weather;
 import com.bj4.yhh.everyday.LoaderManager;
 import com.bj4.yhh.everyday.R;
 import com.bj4.yhh.everyday.cards.CardsRelativeLayout;
+import com.bj4.yhh.everyday.cards.CardsRelativeLayout.ContentLoadingCallback;
 
 import android.content.Context;
 import android.content.Intent;
@@ -47,7 +48,6 @@ public class WeartherCards extends CardsRelativeLayout {
         super(context, attrs, defStyle);
     }
 
-
     public void onDataUpdated() {
         mLoading.setVisibility(View.GONE);
         mMainLayout.setVisibility(View.VISIBLE);
@@ -69,6 +69,7 @@ public class WeartherCards extends CardsRelativeLayout {
             mCallback.setListViewHeightBasedOnChildren();
         }
         refreshContent(mWeathersPager.getCurrentItem());
+        onRefreshDone();
     }
 
     private void refreshContent(int position) {
@@ -152,7 +153,8 @@ public class WeartherCards extends CardsRelativeLayout {
     }
 
     @Override
-    public void updateContent() {
+    public void updateContent(ContentLoadingCallback cb) {
+        super.updateContent(cb);
         if (mWeatherPagerAdapter != null) {
             mWeatherPagerAdapter.forceReload();
         }

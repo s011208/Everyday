@@ -24,7 +24,7 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.FrameLayout;
 
-public class LoaderManager {
+public class LoaderManager implements CardsRelativeLayout.ContentLoadingCallback {
     private static final boolean DEBUG = true;
 
     private static final String TAG = "QQQQ";
@@ -43,6 +43,8 @@ public class LoaderManager {
             50);
 
     public interface Callback {
+        public void allContentRefreshDone();
+
         public void dataLoadingDone();
 
         public void setListViewHeightBasedOnChildren();
@@ -57,6 +59,8 @@ public class LoaderManager {
 
         public void loadComplete(int result);
     }
+
+    private int mUpdatingCards = 0;
 
     public synchronized static final LoaderManager getInstance(Context context) {
         if (sInstance == null) {
@@ -101,20 +105,24 @@ public class LoaderManager {
     }
 
     private void updateCard(int cardType) {
+        mUpdatingCards = 0;
         Iterator<CardsRelativeLayout> iter = mCardsContentCache.snapshot().values().iterator();
         while (iter.hasNext()) {
             CardsRelativeLayout card = iter.next();
             if (card.getCardType() == cardType) {
-                card.updateContent();
+                card.updateContent(this);
+                ++mUpdatingCards;
             }
         }
     }
 
     private void updateAllCards() {
+        mUpdatingCards = 0;
         Iterator<CardsRelativeLayout> iter = mCardsContentCache.snapshot().values().iterator();
         while (iter.hasNext()) {
             CardsRelativeLayout card = iter.next();
-            card.updateContent();
+            card.updateContent(this);
+            ++mUpdatingCards;
         }
     }
 
@@ -226,6 +234,14 @@ public class LoaderManager {
                     }
                 }
             }
+        }
+    }
+
+    @Override
+    public void onRefreshDone() {
+        --mUpdatingCards;
+        if (mUpdatingCards <= 0) {
+            mCallbacks.allContentRefreshDone();
         }
     }
 }

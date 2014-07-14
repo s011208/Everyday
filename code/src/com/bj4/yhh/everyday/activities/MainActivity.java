@@ -94,6 +94,7 @@ public class MainActivity extends Activity implements LoaderManager.Callback {
             @Override
             public void onRefresh() {
                 if (mLoaderManager != null) {
+                    Log.d(TAG, "main activity forceReload");
                     mLoaderManager.forceReload();
                 }
             }
@@ -112,7 +113,7 @@ public class MainActivity extends Activity implements LoaderManager.Callback {
     @Override
     public void dataLoadingDone() {
         forceReload();
-        mRefreshLayout.setRefreshing(false);
+        Log.d(TAG, "main activity dataLoadingDone");
     }
 
     public void setListViewHeightBasedOnChildren() {
@@ -134,6 +135,11 @@ public class MainActivity extends Activity implements LoaderManager.Callback {
         params.height = totalHeight + (mCardList.getDividerHeight() * (listAdapter.getCount() - 1));
         mCardList.setLayoutParams(params);
         mCardList.requestLayout();
+    }
+
+    @Override
+    public void allContentRefreshDone() {
+        mRefreshLayout.setRefreshing(false);
     }
 
 }

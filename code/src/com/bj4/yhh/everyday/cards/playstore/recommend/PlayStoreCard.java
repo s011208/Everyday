@@ -8,6 +8,7 @@ import java.util.Iterator;
 import com.bj4.yhh.everyday.Card;
 import com.bj4.yhh.everyday.R;
 import com.bj4.yhh.everyday.cards.CardsRelativeLayout;
+import com.bj4.yhh.everyday.cards.CardsRelativeLayout.ContentLoadingCallback;
 import com.bj4.yhh.everyday.cards.allapps.AllappsCard;
 import com.bj4.yhh.everyday.database.DatabaseHelper;
 import com.bj4.yhh.everyday.services.UpdateDataService;
@@ -73,7 +74,8 @@ public class PlayStoreCard extends CardsRelativeLayout {
     }
 
     @Override
-    public void updateContent() {
+    public void updateContent(ContentLoadingCallback cb) {
+        super.updateContent(cb);
         updateContent(true);
     }
 
@@ -146,6 +148,7 @@ public class PlayStoreCard extends CardsRelativeLayout {
             }
             mTopLayout.setVisibility(View.VISIBLE);
             mLoadingProgress.setVisibility(View.GONE);
+            onRefreshDone();
         }
     }
 }

@@ -31,6 +31,7 @@ import android.widget.TextView;
 
 import com.bj4.yhh.everyday.R;
 import com.bj4.yhh.everyday.cards.CardsRelativeLayout;
+import com.bj4.yhh.everyday.cards.CardsRelativeLayout.ContentLoadingCallback;
 import com.bj4.yhh.everyday.cards.weather.WeatherSettingActivity;
 import com.bj4.yhh.everyday.database.DatabaseHelper;
 
@@ -63,7 +64,8 @@ public class AllappsCard extends CardsRelativeLayout {
     }
 
     @Override
-    public void updateContent() {
+    public void updateContent(ContentLoadingCallback cb) {
+        super.updateContent(cb);
         new AllappsLoaderTask().execute();
     }
 
@@ -109,6 +111,7 @@ public class AllappsCard extends CardsRelativeLayout {
         @Override
         protected void onPostExecute(Void result) {
             onDataUpdated();
+            onRefreshDone();
         }
 
         public void onDataUpdated() {

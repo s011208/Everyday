@@ -17,6 +17,18 @@ public abstract class CardsRelativeLayout extends RelativeLayout {
 
     protected LoaderManager.Callback mCallback;
 
+    public interface ContentLoadingCallback {
+        public void onRefreshDone();
+    }
+
+    private ContentLoadingCallback mContentLoadingCallback;
+
+    public void onRefreshDone() {
+        if (mContentLoadingCallback != null) {
+            mContentLoadingCallback.onRefreshDone();
+        }
+    }
+
     private static final HandlerThread sWorkerThread = new HandlerThread("Cards handler");
     static {
         sWorkerThread.setPriority(Thread.MAX_PRIORITY);
@@ -57,5 +69,7 @@ public abstract class CardsRelativeLayout extends RelativeLayout {
 
     public abstract void initCompoments();
 
-    public abstract void updateContent();
+    public void updateContent(ContentLoadingCallback cb) {
+        mContentLoadingCallback = cb;
+    }
 }
