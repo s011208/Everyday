@@ -30,7 +30,7 @@ public class WeartherCards extends CardsRelativeLayout {
 
     private ProgressBar mLoading;
 
-    private ImageView mOption, mNextPage, mPreviousPage;
+    private ImageView mNextPage, mPreviousPage;
 
     private TextView mPagerTitle;
 
@@ -118,15 +118,6 @@ public class WeartherCards extends CardsRelativeLayout {
         mWeatherPagerAdapter = new WeatherPagerAdapter(mContext, this);
         mWeathersPager.setAdapter(mWeatherPagerAdapter);
         mPagerTitle = (TextView)findViewById(R.id.weather_location);
-        mOption = (ImageView)findViewById(R.id.weather_option);
-        mOption.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(mContext, WeatherSettingActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                mContext.startActivity(intent);
-            }
-        });
         mNextPage = (ImageView)findViewById(R.id.weather_move_to_next);
         mNextPage.setOnClickListener(new OnClickListener() {
             @Override

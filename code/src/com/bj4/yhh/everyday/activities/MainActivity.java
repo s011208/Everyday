@@ -4,8 +4,14 @@ package com.bj4.yhh.everyday.activities;
 import com.bj4.yhh.everyday.EverydayApplication;
 import com.bj4.yhh.everyday.LoaderManager;
 import com.bj4.yhh.everyday.R;
+import com.bj4.yhh.everyday.activities.utils.MainActionBar;
+import com.bj4.yhh.everyday.activities.utils.MainSettingView;
 import com.bj4.yhh.everyday.services.CitiesLoadingService;
 
+import android.animation.Animator;
+import android.animation.Animator.AnimatorListener;
+import android.animation.ValueAnimator;
+import android.animation.ValueAnimator.AnimatorUpdateListener;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,15 +22,18 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.MeasureSpec;
+import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
+import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.ViewSwitcher;
 
 public class MainActivity extends Activity implements LoaderManager.Callback {
     private static final boolean DEBUG = true;
@@ -38,6 +47,14 @@ public class MainActivity extends Activity implements LoaderManager.Callback {
     private CardListAdapter mCardListAdapter;
 
     private SwipeRefreshLayout mRefreshLayout;
+
+    private MainActionBar mActionBar;
+
+    private MainSettingView mSettingView;
+
+    private ValueAnimator mSettingViewAnimator;
+
+    private ViewSwitcher mOption;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,11 +76,20 @@ public class MainActivity extends Activity implements LoaderManager.Callback {
         super.onResume();
         forceReload();
         mLoaderManager.addCallback(this);
+        collapseSettingView(false);
     }
 
     protected void onPause() {
         super.onPause();
         mLoaderManager.removeCallback(this);
+    }
+
+    public void onBackPressed() {
+        if (mSettingView.getScaleX() != 0) {
+            collapseSettingView(true);
+        } else {
+            super.onBackPressed();
+        }
     }
 
     private void init() {
@@ -73,6 +99,91 @@ public class MainActivity extends Activity implements LoaderManager.Callback {
 
     private void initBasic() {
         mLoaderManager = EverydayApplication.getLoaderManager(getApplicationContext());
+        mActionBar = (MainActionBar)findViewById(R.id.main_action_bar);
+        mOption = (ViewSwitcher)findViewById(R.id.main_option);
+        mOption.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                expandSettingView(true);
+            }
+        });
+        mSettingView = (MainSettingView)findViewById(R.id.main_setting_parent);
+        mSettingView.setPivotX(getResources().getConfiguration().screenWidthDp * 2);
+        mSettingViewAnimator = ValueAnimator.ofFloat(0, 1);
+        mSettingViewAnimator.setDuration(300);
+        mSettingViewAnimator.addUpdateListener(new AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                mSettingView.setScaleX((Float)animation.getAnimatedValue());
+            }
+        });
+    }
+
+    public void expandSettingView(boolean animation) {
+        mSettingView.bringToFront();
+        if (mSettingView.getScaleX() == 1) {
+            collapseSettingView(animation);
+            return;
+        } else if (mSettingView.getScaleX() > 0) {
+            return;
+        }
+        if (animation) {
+            mSettingViewAnimator.removeAllListeners();
+            mSettingViewAnimator.addListener(new AnimatorListener() {
+
+                @Override
+                public void onAnimationStart(Animator animation) {
+                    mSettingView.setVisibility(View.VISIBLE);
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animation) {
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animation) {
+                }
+            });
+            mSettingViewAnimator.start();
+        } else {
+            mSettingView.setScaleX(1f);
+            mSettingView.setVisibility(View.VISIBLE);
+        }
+        mOption.setDisplayedChild(1);
+    }
+
+    public void collapseSettingView(boolean animation) {
+        if (animation) {
+            mSettingViewAnimator.removeAllListeners();
+            mSettingViewAnimator.addListener(new AnimatorListener() {
+
+                @Override
+                public void onAnimationStart(Animator animation) {
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mSettingView.setVisibility(View.GONE);
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animation) {
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animation) {
+                }
+            });
+            mSettingViewAnimator.reverse();
+        } else {
+            mSettingView.setScaleX(0f);
+            mSettingView.setVisibility(View.GONE);
+        }
+        mOption.setDisplayedChild(0);
     }
 
     private void initCardsList() {

@@ -7,5 +7,13 @@
     <string name="loading">Loading...</string>
     <string name="none_data_hint">Please add some data</string>
     <string name="toast_type_loading_data_failed">Loading data failed</string>
+    <string name="play_store">Play store recommand</string>
+    <string name="weather">Weather</string>
+    <string name="favorite_apps">Favorite apps</string>
 
-</resources>
+    <string-array name="cards_set">
+        <item>@string/play_store</item>
+        <item>@string/weather</item>
+        <item>@string/favorite_apps</item>
+    </string-array>
+</resources>

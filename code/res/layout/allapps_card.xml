@@ -9,22 +9,11 @@
         android:layout_height="wrap_content"
         android:visibility="invisible" >
 
-        <ImageView
-            android:id="@+id/allapps_option"
-            android:layout_width="@dimen/option_ic_size"
-            android:layout_height="@dimen/option_ic_size"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="5dp"
-            android:padding="@dimen/option_ic_padding"
-            android:scaleType="centerInside"
-            android:src="@drawable/ic_option_btn" />
-
         <HorizontalScrollView
             android:id="@+id/allapps_main_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scrollbars="none"
-            android:layout_below="@+id/allapps_option" >
+            android:scrollbars="none" >
 
             <LinearLayout
                 android:id="@+id/allapps_container"

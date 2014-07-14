@@ -52,8 +52,6 @@ public class AllappsCard extends CardsRelativeLayout {
 
     private ProgressBar mProgressHint;
 
-    private ImageView mOption;
-
     private DatabaseHelper mDatabaseHelper;
 
     private ValueAnimator mJumpyShortcutAnimation;
@@ -113,16 +111,6 @@ public class AllappsCard extends CardsRelativeLayout {
         mTopLayout = (RelativeLayout)findViewById(R.id.top_layout);
         mAllappsContainer = (LinearLayout)findViewById(R.id.allapps_container);
         mProgressHint = (ProgressBar)findViewById(R.id.loading_progress);
-        mOption = (ImageView)findViewById(R.id.allapps_option);
-        mOption.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(mContext, AllappsSettingActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                mContext.startActivity(intent);
-            }
-        });
         mJumpyShortcutAnimation = ValueAnimator.ofFloat(0.9f, 1.1f, 0.95f, 1.05f, 1);
         mJumpyShortcutAnimation.setDuration(500);
         mJumpyShortcutAnimation.addUpdateListener(new AnimatorUpdateListener() {

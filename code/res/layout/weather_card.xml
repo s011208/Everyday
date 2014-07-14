@@ -23,16 +23,6 @@
                 android:textColor="@color/weather_txt_color"
                 android:textSize="@dimen/weather_location_txtsize" />
 
-            <ImageView
-                android:id="@+id/weather_option"
-                android:layout_width="@dimen/option_ic_size"
-                android:layout_height="@dimen/option_ic_size"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:layout_marginRight="5dp"
-                android:padding="@dimen/option_ic_padding"
-                android:scaleType="centerInside"
-                android:src="@drawable/ic_option_btn" />
         </RelativeLayout>
 
         <ImageView
