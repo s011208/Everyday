@@ -4,6 +4,8 @@ package com.bj4.yhh.everyday.cards.allapps;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.animation.ValueAnimator;
+import android.animation.ValueAnimator.AnimatorUpdateListener;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +16,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.text.TextUtils.TruncateAt;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -41,6 +44,8 @@ public class AllappsCard extends CardsRelativeLayout {
 
     private static final boolean DEBUG = true;
 
+    private static final int JUMPY_SHORTCUT_ANIMATION_INTERVAL = 2000;
+
     private RelativeLayout mTopLayout;
 
     private LinearLayout mAllappsContainer;
@@ -50,6 +55,24 @@ public class AllappsCard extends CardsRelativeLayout {
     private ImageView mOption;
 
     private DatabaseHelper mDatabaseHelper;
+
+    private ValueAnimator mJumpyShortcutAnimation;
+
+    private Handler mHandler;
+
+    private int mRandomTarget = 0;
+
+    private Runnable mJumpyShortcutAnimationRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (mAllappsContainer.getChildCount() != 0) {
+                mRandomTarget = ((int)(Math.random() * 100) % mAllappsContainer.getChildCount());
+                mJumpyShortcutAnimation.start();
+            }
+            mHandler.removeCallbacks(mJumpyShortcutAnimationRunnable);
+            mHandler.postDelayed(mJumpyShortcutAnimationRunnable, JUMPY_SHORTCUT_ANIMATION_INTERVAL);
+        }
+    };
 
     public AllappsCard(Context context) {
         this(context, null);
@@ -70,6 +93,21 @@ public class AllappsCard extends CardsRelativeLayout {
         new AllappsLoaderTask().execute();
     }
 
+    public void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        if (mHandler != null) {
+            mHandler.removeCallbacks(mJumpyShortcutAnimationRunnable);
+            mHandler.postDelayed(mJumpyShortcutAnimationRunnable, JUMPY_SHORTCUT_ANIMATION_INTERVAL);
+        }
+    }
+
+    public void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        if (mHandler != null) {
+            mHandler.removeCallbacks(mJumpyShortcutAnimationRunnable);
+        }
+    }
+
     @Override
     public void initCompoments() {
         mTopLayout = (RelativeLayout)findViewById(R.id.top_layout);
@@ -83,6 +121,21 @@ public class AllappsCard extends CardsRelativeLayout {
                 Intent intent = new Intent(mContext, AllappsSettingActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 mContext.startActivity(intent);
+            }
+        });
+        mJumpyShortcutAnimation = ValueAnimator.ofFloat(0.9f, 1.1f, 0.95f, 1.05f, 1);
+        mJumpyShortcutAnimation.setDuration(500);
+        mJumpyShortcutAnimation.addUpdateListener(new AnimatorUpdateListener() {
+
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                try {
+                    float value = (Float)animation.getAnimatedValue();
+                    View v = mAllappsContainer.getChildAt(mRandomTarget);
+                    v.setScaleX(value);
+                    v.setScaleY(value);
+                } catch (Exception e) {
+                }
             }
         });
         new AllappsLoaderTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -111,6 +164,9 @@ public class AllappsCard extends CardsRelativeLayout {
 
         @Override
         protected void onPostExecute(Void result) {
+            if (mHandler == null) {
+                mHandler = new Handler();
+            }
             onDataUpdated();
             onRefreshDone();
         }
@@ -148,6 +204,8 @@ public class AllappsCard extends CardsRelativeLayout {
                 }
                 mAllappsContainer.addView(shortcut);
             }
+            mHandler.removeCallbacks(mJumpyShortcutAnimationRunnable);
+            mHandler.postDelayed(mJumpyShortcutAnimationRunnable, JUMPY_SHORTCUT_ANIMATION_INTERVAL);
         }
     }
 }
