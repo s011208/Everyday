@@ -15,19 +15,27 @@ import com.bj4.yhh.everyday.services.UpdateDataService;
 import com.bj4.yhh.everyday.utils.Utils;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 
+import android.animation.Animator;
+import android.animation.Animator.AnimatorListener;
+import android.animation.ValueAnimator;
+import android.animation.ValueAnimator.AnimatorUpdateListener;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.ViewSwitcher;
 
 public class PlayStoreCard extends CardsRelativeLayout {
 
@@ -41,9 +49,29 @@ public class PlayStoreCard extends CardsRelativeLayout {
 
     private ProgressBar mLoadingProgress;
 
-    private LinearLayout mTopLayout;
+    private FrameLayout mTopLayout;
 
     private LayoutInflater mInflater;
+
+    private ArrayList<View> mContainers = new ArrayList<View>();
+
+    private long mCurrentIndicator = 0;
+
+    private Handler mHandler;
+
+    private ValueAnimator mSwitchViewHelper;
+
+    private Runnable mUpdateContentRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (mContainers.size() > 0) {
+                ++mCurrentIndicator;
+                mSwitchViewHelper.start();
+                mHandler.removeCallbacks(mUpdateContentRunnable);
+                mHandler.postDelayed(mUpdateContentRunnable, 5000);
+            }
+        }
+    };
 
     public PlayStoreCard(Context context) {
         this(context, null);
@@ -57,13 +85,49 @@ public class PlayStoreCard extends CardsRelativeLayout {
         super(context, attrs, defStyle);
     }
 
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+            mHandler.removeCallbacks(mUpdateContentRunnable);
+        } else if (ev.getAction() == MotionEvent.ACTION_UP) {
+            mHandler.removeCallbacks(mUpdateContentRunnable);
+            mHandler.postDelayed(mUpdateContentRunnable, 5000);
+        }
+        super.dispatchTouchEvent(ev);
+        return true;
+    }
+
     @Override
     public void initCompoments() {
         mDatabaseHelper = DatabaseHelper.getInstance(mContext);
         mLoadingProgress = (ProgressBar)findViewById(R.id.loading_progress);
-        mTopLayout = (LinearLayout)findViewById(R.id.top_layout);
+        mTopLayout = (FrameLayout)findViewById(R.id.top_layout);
         mInflater = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mData = mDatabaseHelper.getPlayStoreItems();
+        mSwitchViewHelper = ValueAnimator.ofFloat(0, 1);
+        mSwitchViewHelper.setDuration(400);
+        mSwitchViewHelper.addUpdateListener(new AnimatorUpdateListener() {
+
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                if (mContainers.size() > 0) {
+                    float value = (Float)animation.getAnimatedValue();
+                    int currentIndex = (int)((mCurrentIndicator - 1) % mContainers.size());
+                    int nextIndex = (int)(mCurrentIndicator % mContainers.size());
+                    if (currentIndex != nextIndex) {
+                        if (value == 0) {
+                            mContainers.get(nextIndex).setScaleX(0);
+                            mContainers.get(nextIndex).setVisibility(View.VISIBLE);
+                            mContainers.get(nextIndex).bringToFront();
+                        } else if (value == 1) {
+                            mContainers.get(currentIndex).setVisibility(View.GONE);
+                        } else {
+                            mContainers.get(nextIndex).setScaleX(value);
+                            mContainers.get(currentIndex).setScaleX(1 - value);
+                        }
+                    }
+                }
+            }
+        });
         if (mData.isEmpty()) {
             Intent service = new Intent(mContext, UpdateDataService.class);
             service.putExtra(UpdateDataService.INTENT_KEY_UPDATE_DATA_FROM_INTERNET,
@@ -90,7 +154,6 @@ public class PlayStoreCard extends CardsRelativeLayout {
     }
 
     class UpdateViewTask extends AsyncTask<Void, Void, Void> {
-        private ArrayList<View> mContainers = new ArrayList<View>();
 
         @Override
         protected Void doInBackground(Void... params) {
@@ -149,10 +212,19 @@ public class PlayStoreCard extends CardsRelativeLayout {
         @Override
         protected void onPostExecute(Void result) {
             if (mContainers.size() > 0) {
+                if (mSwitchViewHelper.isStarted()) {
+                    mSwitchViewHelper.cancel();
+                }
                 mTopLayout.removeAllViews();
                 for (View v : mContainers) {
                     mTopLayout.addView(v);
+                    v.setVisibility(View.GONE);
                 }
+                if (mHandler == null) {
+                    mHandler = new Handler();
+                }
+                mHandler.removeCallbacks(mUpdateContentRunnable);
+                mHandler.post(mUpdateContentRunnable);
             }
             mTopLayout.setVisibility(View.VISIBLE);
             mLoadingProgress.setVisibility(View.GONE);
