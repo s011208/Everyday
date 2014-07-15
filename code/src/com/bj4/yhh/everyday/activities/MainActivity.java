@@ -50,7 +50,7 @@ public class MainActivity extends Activity implements LoaderManager.Callback {
 
     private MainSettingView mSettingView;
 
-    private ValueAnimator mSettingViewAnimator;
+    private ValueAnimator mSettingViewAnimator, mCardListAnimator;
 
     private ViewSwitcher mOption;
 
@@ -114,6 +114,7 @@ public class MainActivity extends Activity implements LoaderManager.Callback {
             @Override
             public void onClick(View v) {
                 if (mLoaderManager != null) {
+                    collapseCardList();
                     mActionBar.startUpdating();
                     mLoaderManager.forceReload();
                 }
@@ -128,6 +129,17 @@ public class MainActivity extends Activity implements LoaderManager.Callback {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 mSettingView.setScaleX((Float)animation.getAnimatedValue());
+            }
+        });
+
+        // main view
+        mCardListAnimator = ValueAnimator.ofFloat(0, 1);
+        mCardListAnimator.setDuration(150);
+        mCardListAnimator.addUpdateListener(new AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                float value = (Float)animation.getAnimatedValue();
+                mCardList.setAlpha(value);
             }
         });
     }
@@ -199,8 +211,17 @@ public class MainActivity extends Activity implements LoaderManager.Callback {
         mOption.setDisplayedChild(0);
     }
 
+    private void expandCardList() {
+        mCardListAnimator.start();
+    }
+
+    private void collapseCardList() {
+        mCardListAnimator.reverse();
+    }
+
     private void initCardsList() {
         mCardList = (ListView)findViewById(R.id.card_list);
+        mCardList.setPivotY(0);
         mCardListAdapter = new CardListAdapter(this, mLoaderManager,
                 new CardListAdapter.RequestRefreshCallback() {
 
@@ -212,21 +233,6 @@ public class MainActivity extends Activity implements LoaderManager.Callback {
                     }
                 });
         mCardList.setAdapter(mCardListAdapter);
-        // mRefreshLayout =
-        // (SwipeRefreshLayout)findViewById(R.id.swipe_container);
-        // mRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
-        //
-        // @Override
-        // public void onRefresh() {
-        // if (mLoaderManager != null) {
-        // Log.d(TAG, "main activity forceReload");
-        // mLoaderManager.forceReload();
-        // }
-        // }
-        // });
-        // mRefreshLayout.setColorScheme(android.R.color.holo_blue_bright,
-        // android.R.color.holo_green_light, android.R.color.holo_orange_light,
-        // android.R.color.holo_red_light);
     }
 
     private void forceReload() {
@@ -265,6 +271,7 @@ public class MainActivity extends Activity implements LoaderManager.Callback {
     @Override
     public void allContentRefreshDone() {
         mActionBar.finishUpdating();
+        expandCardList();
     }
 
 }
