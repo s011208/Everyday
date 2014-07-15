@@ -65,12 +65,18 @@ public class PlayStoreCard extends CardsRelativeLayout {
 
     private int mAnimationType = 0;
 
+    private boolean mFirstInflate = false;
+
     private Runnable mUpdateContentRunnable = new Runnable() {
         @Override
         public void run() {
             if (mContainers.size() > 0) {
                 ++mCurrentIndicator;
-                mAnimationType = ((int)(Math.random() * 100) % 3);
+                if (mFirstInflate) {
+                    mFirstInflate = false;
+                } else {
+                    mAnimationType = ((int)(Math.random() * 100) % 3);
+                }
                 mSwitchViewHelper.start();
                 mHandler.removeCallbacks(mUpdateContentRunnable);
                 mHandler.postDelayed(mUpdateContentRunnable, SWITCH_ANIMATION_INTERVAL);
@@ -236,6 +242,7 @@ public class PlayStoreCard extends CardsRelativeLayout {
 
         @Override
         protected void onPostExecute(Void result) {
+            mFirstInflate = true;
             if (mContainers.size() > 0) {
                 if (mSwitchViewHelper.isStarted()) {
                     mSwitchViewHelper.cancel();
