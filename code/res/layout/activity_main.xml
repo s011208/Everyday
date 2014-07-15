@@ -4,33 +4,22 @@
     android:layout_height="match_parent"
     android:background="@color/main_activity_bg" >
 
-    <!-- <com.bj4.yhh.everyday.activities.utils.AnimatedIndicatorView -->
-    <!-- android:id="@+id/animated_footer" -->
-    <!-- android:layout_width="match_parent" -->
-    <!-- android:layout_height="80dp" -->
-    <!-- android:layout_alignParentBottom="true" /> -->
-
     <include layout="@layout/main_action_bar" />
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/swipe_container"
+    <ListView
+        android:id="@+id/card_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
         android:layout_below="@+id/main_action_bar"
         android:layout_marginBottom="@dimen/cards_container_margin_v"
         android:layout_marginLeft="@dimen/cards_container_margin_h"
         android:layout_marginRight="@dimen/cards_container_margin_h"
-        android:paddingTop="3dp" >
-
-        <ListView
-            android:id="@+id/card_list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:divider="@android:color/transparent"
-            android:dividerHeight="@dimen/cards_list_view_item_space"
-            android:scrollbars="none" >
-        </ListView>
-    </android.support.v4.widget.SwipeRefreshLayout>
+        android:divider="@android:color/transparent"
+        android:dividerHeight="@dimen/cards_list_view_item_space"
+        android:paddingTop="3dp"
+        android:scrollbars="none" >
+    </ListView>
 
     <com.bj4.yhh.everyday.activities.utils.MainSettingView
         android:id="@+id/main_setting_parent"
@@ -42,13 +31,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_centerVertical="true"
-            android:padding="2dp"
             android:layout_marginBottom="@dimen/setting_view_margin_v"
             android:layout_marginRight="@dimen/setting_view_margin_h"
             android:layout_marginTop="@dimen/setting_view_margin_v"
             android:background="#ddffffff"
             android:divider="@android:color/black"
-            android:dividerHeight="2dip" >
+            android:dividerHeight="2dip"
+            android:padding="2dp" >
         </ListView>
     </com.bj4.yhh.everyday.activities.utils.MainSettingView>
 

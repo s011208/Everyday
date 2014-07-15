@@ -4,8 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="45dp"
     android:layout_marginLeft="@dimen/cards_container_margin_h"
-    android:layout_marginRight="@dimen/cards_container_margin_h"
-    android:background="#ffffff" >
+    android:layout_marginRight="@dimen/cards_container_margin_h" >
+
+    <com.bj4.yhh.everyday.activities.utils.AnimatedUpdatingView
+        android:id="@+id/animated_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#ffffff" />
 
     <ViewSwitcher
         android:id="@+id/main_option"
@@ -28,5 +33,14 @@
             android:scaleType="centerInside"
             android:src="@drawable/ic_arrow_to_left" />
     </ViewSwitcher>
+
+    <ImageView
+        android:id="@+id/refresh_btn"
+        android:layout_width="@dimen/option_ic_size"
+        android:layout_height="@dimen/option_ic_size"
+        android:layout_toRightOf="@+id/main_option"
+        android:padding="@dimen/option_ic_padding"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_refresh_btn" />
 
 </com.bj4.yhh.everyday.activities.utils.MainActionBar>

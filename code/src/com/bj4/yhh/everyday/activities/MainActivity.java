@@ -46,8 +46,6 @@ public class MainActivity extends Activity implements LoaderManager.Callback {
 
     private CardListAdapter mCardListAdapter;
 
-    private SwipeRefreshLayout mRefreshLayout;
-
     private MainActionBar mActionBar;
 
     private MainSettingView mSettingView;
@@ -55,6 +53,8 @@ public class MainActivity extends Activity implements LoaderManager.Callback {
     private ValueAnimator mSettingViewAnimator;
 
     private ViewSwitcher mOption;
+
+    private ImageView mRefreshContent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,7 +99,9 @@ public class MainActivity extends Activity implements LoaderManager.Callback {
 
     private void initBasic() {
         mLoaderManager = EverydayApplication.getLoaderManager(getApplicationContext());
+        // action bar
         mActionBar = (MainActionBar)findViewById(R.id.main_action_bar);
+        mActionBar.setActivity(this);
         mOption = (ViewSwitcher)findViewById(R.id.main_option);
         mOption.setOnClickListener(new OnClickListener() {
             @Override
@@ -107,6 +109,17 @@ public class MainActivity extends Activity implements LoaderManager.Callback {
                 expandSettingView(true);
             }
         });
+        mRefreshContent = (ImageView)findViewById(R.id.refresh_btn);
+        mRefreshContent.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mLoaderManager != null) {
+                    mActionBar.startUpdating();
+                    mLoaderManager.forceReload();
+                }
+            }
+        });
+        // setting view
         mSettingView = (MainSettingView)findViewById(R.id.main_setting_parent);
         mSettingView.setPivotX(0);
         mSettingViewAnimator = ValueAnimator.ofFloat(0, 1);
@@ -199,20 +212,21 @@ public class MainActivity extends Activity implements LoaderManager.Callback {
                     }
                 });
         mCardList.setAdapter(mCardListAdapter);
-        mRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swipe_container);
-        mRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
-
-            @Override
-            public void onRefresh() {
-                if (mLoaderManager != null) {
-                    Log.d(TAG, "main activity forceReload");
-                    mLoaderManager.forceReload();
-                }
-            }
-        });
-        mRefreshLayout.setColorScheme(android.R.color.holo_blue_bright,
-                android.R.color.holo_green_light, android.R.color.holo_orange_light,
-                android.R.color.holo_red_light);
+        // mRefreshLayout =
+        // (SwipeRefreshLayout)findViewById(R.id.swipe_container);
+        // mRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
+        //
+        // @Override
+        // public void onRefresh() {
+        // if (mLoaderManager != null) {
+        // Log.d(TAG, "main activity forceReload");
+        // mLoaderManager.forceReload();
+        // }
+        // }
+        // });
+        // mRefreshLayout.setColorScheme(android.R.color.holo_blue_bright,
+        // android.R.color.holo_green_light, android.R.color.holo_orange_light,
+        // android.R.color.holo_red_light);
     }
 
     private void forceReload() {
@@ -250,7 +264,7 @@ public class MainActivity extends Activity implements LoaderManager.Callback {
 
     @Override
     public void allContentRefreshDone() {
-        mRefreshLayout.setRefreshing(false);
+        mActionBar.finishUpdating();
     }
 
 }
